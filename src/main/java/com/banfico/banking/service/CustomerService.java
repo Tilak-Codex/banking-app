@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.banfico.banking.entity.Customer;
+import com.banfico.banking.exception.CustomerNotFound;
 import com.banfico.banking.repository.CustomerRepository;
 
 @Service
@@ -25,7 +26,7 @@ public class CustomerService {
 
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new CustomerNotFound("Customer not found with id: " + id));
     }
 
     public List<Customer> getAllCustomers() {
@@ -34,7 +35,7 @@ public class CustomerService {
 
     public Customer updateCustomer(Long id, Customer customerDetails) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new CustomerNotFound("Customer not found with id: " + id));
 
         customer.setName(customerDetails.getName());
         customer.setEmail(customerDetails.getEmail());
@@ -44,7 +45,7 @@ public class CustomerService {
     }
     public void deleteCustomer(Long id) {
     Customer customer = customerRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Customer not found"));
+            .orElseThrow(() -> new CustomerNotFound("Customer not found with id: " + id));
 
     customerRepository.delete(customer);
 }
