@@ -43,13 +43,12 @@ public class GlobalExceptionHandler {
                                 .status(HttpStatus.NOT_FOUND)
                                 .body(exception.getMessage());
         }
+        @ExceptionHandler(ConsentNotFoundException.class)
+public ResponseEntity<String> handleConsentNotFound(
+        ConsentNotFoundException exception) {
 
-        @ExceptionHandler(BeneficiaryNotFoundException.class)
-        public ResponseEntity<String> handleBeneficiaryNotFound(
-                        BeneficiaryNotFoundException exception) {
-
-                return ResponseEntity
-                                .status(HttpStatus.NOT_FOUND)
-                                .body(exception.getMessage());
-        }
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(exception.getMessage());
+}
 }
