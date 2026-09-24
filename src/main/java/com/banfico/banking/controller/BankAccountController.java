@@ -16,12 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.banfico.banking.dto.BankAccountRequest;
 import com.banfico.banking.dto.BankAccountResponse;
+import com.banfico.banking.dto.BankAccountUpdateRequest;
 import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.dto.TransactionResponse;
-import com.banfico.banking.entity.Customer;
 import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
-import com.banfico.banking.dto.BankAccountUpdateRequest;
 
 import jakarta.validation.Valid;
 
@@ -55,12 +54,12 @@ public class BankAccountController {
     }
 
     @PutMapping("/{id}")
-public BankAccountResponse updateBankAccount(
-        @PathVariable Long id,
-        @Valid @RequestBody BankAccountUpdateRequest request) {
+    public BankAccountResponse updateBankAccount(
+            @PathVariable Long id,
+            @Valid @RequestBody BankAccountUpdateRequest request) {
 
-    return bankAccountService.updateBankAccount(id, request);
-}
+        return bankAccountService.updateBankAccount(id, request);
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -77,9 +76,9 @@ public BankAccountResponse updateBankAccount(
     }
 
     @GetMapping("/{accountId}/customers")
-public Set<CustomerResponse> getCustomersByBankAccountId(
-        @PathVariable Long accountId) {
+    public Set<CustomerResponse> getCustomersByBankAccountId(
+            @PathVariable Long accountId) {
 
-    return bankAccountService.getCustomersByBankAccountId(accountId);
-}
+        return bankAccountService.getCustomersByBankAccountId(accountId);
+    }
 }
