@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.banfico.banking.entity.Transaction;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+public interface TransactionRepository
+        extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findByBankAccountId(Long accountId);
+    List<Transaction> findByBankAccountIdOrderByTransactionDateDesc(
+            Long bankAccountId);
 }

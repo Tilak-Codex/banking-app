@@ -5,8 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.banfico.banking.entity.BankAccount;
+import com.banfico.banking.entity.Customer;
 import com.banfico.banking.exception.BankAccountNotFoundException;
 import com.banfico.banking.repository.BankAccountRepository;
+import java.util.Set;
+
+import com.banfico.banking.entity.Customer;
 
 @Service
 public class BankAccountService {
@@ -47,6 +51,14 @@ public class BankAccountService {
                     "Bank account not found"));
 
     bankAccountRepository.delete(bankAccount);
+}
+public Set<Customer> getCustomersByBankAccountId(Long accountId) {
+
+    BankAccount bankAccount = bankAccountRepository.findById(accountId)
+            .orElseThrow(() -> new BankAccountNotFoundException(
+                    "Bank account not found"));
+
+    return bankAccount.getCustomers();
 }
 
 }

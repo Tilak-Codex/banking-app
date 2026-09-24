@@ -1,6 +1,7 @@
 package com.banfico.banking.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banfico.banking.entity.BankAccount;
+import com.banfico.banking.entity.Customer;
 import com.banfico.banking.entity.Transaction;
 import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
@@ -64,5 +66,12 @@ public class BankAccountController {
     public List<Transaction> getTransactionsByBankAccountId(
             @PathVariable Long accountId) {
         return transactionService.getTransactionsByBankAccountId(accountId);
+    }
+
+    @GetMapping("/{accountId}/customers")
+    public Set<Customer> getCustomersByBankAccountId(
+            @PathVariable Long accountId) {
+
+        return bankAccountService.getCustomersByBankAccountId(accountId);
     }
 }

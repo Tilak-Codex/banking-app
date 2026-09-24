@@ -33,6 +33,8 @@ public class Transaction {
     private String description;
 
     private LocalDateTime transactionDate;
+    @Column(nullable = false)
+    private boolean reversed = false;
 
     @ManyToOne
     @JoinColumn(name = "bank_account_id", nullable = false)
@@ -86,4 +88,11 @@ public class Transaction {
     public void setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
     }
+    public boolean isReversed() {
+    return reversed;
+}
+
+public void setReversed(boolean reversed) {
+    this.reversed = reversed;
+}
 }

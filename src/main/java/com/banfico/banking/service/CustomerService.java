@@ -1,6 +1,7 @@
 package com.banfico.banking.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -94,4 +95,12 @@ public class CustomerService {
 
         return customerRepository.save(customer);
     }
+    public Set<BankAccount> getBankAccountsByCustomerId(Long customerId) {
+
+    Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(
+                    "Customer not found"));
+
+    return customer.getBankAccounts();
+}
 }

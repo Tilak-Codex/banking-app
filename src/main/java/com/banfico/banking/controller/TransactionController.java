@@ -36,4 +36,9 @@ public class TransactionController {
     public List<Transaction> getAllTransactions() {
         return transactionService.getAllTransactions();
     }
+    @PostMapping("/{id}/reverse")
+public Transaction reverseTransaction(@PathVariable Long id) {
+
+    return transactionService.reverseTransaction(id);
+}
 }
