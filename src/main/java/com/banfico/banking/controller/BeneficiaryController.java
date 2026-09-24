@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.banfico.banking.entity.Beneficiary;
 import com.banfico.banking.service.BeneficiaryService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/beneficiaries")
@@ -27,13 +28,12 @@ public class BeneficiaryController {
     }
 
     @PostMapping("/customers/{customerId}")
-    public Beneficiary createBeneficiary(
-            @PathVariable Long customerId,
-            @RequestBody Beneficiary beneficiary) {
+public Beneficiary createBeneficiary(
+        @PathVariable Long customerId,
+        @Valid @RequestBody Beneficiary beneficiary) {
 
-        return beneficiaryService.createBeneficiary(
-                customerId, beneficiary);
-    }
+    return beneficiaryService.createBeneficiary(customerId, beneficiary);
+}
 
     @GetMapping("/{id}")
     public Beneficiary getBeneficiaryById(
@@ -47,14 +47,13 @@ public class BeneficiaryController {
         return beneficiaryService.getAllBeneficiaries();
     }
 
-    @PutMapping("/{id}")
-    public Beneficiary updateBeneficiary(
-            @PathVariable Long id,
-            @RequestBody Beneficiary beneficiaryDetails) {
+    @@PutMapping("/{id}")
+public Beneficiary updateBeneficiary(
+        @PathVariable Long id,
+        @Valid @RequestBody Beneficiary beneficiaryDetails) {
 
-        return beneficiaryService.updateBeneficiary(
-                id, beneficiaryDetails);
-    }
+    return beneficiaryService.updateBeneficiary(id, beneficiaryDetails);
+}
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
