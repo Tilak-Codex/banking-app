@@ -160,12 +160,29 @@ return new BankAccountResponse(
 
     return toResponse(updatedCustomer);
 }
-    public void deleteCustomer(Long id) {
+    @Transactional
+public void deleteCustomer(Long id) {
 
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
+    Customer customer = customerRepository.findById(id)
+            .orElseThrow(() ->
+                    new CustomerNotFoundException(
+                            "Customer not found"));
 
-        customerRepository.delete(customer);
+    if (!customer.getBankAccounts().isEmpty()) {
+        throw new IllegalArgumentException(
+                "Customer cannot be deleted because bank accounts are linked");
     }
+
+    if (!customer.getBeneficiaries().isEmpty()) {
+        throw new IllegalArgumentException(
+                "Customer cannot be deleted because beneficiaries exist");
+    }
+
+    if (!customer.getConsents().isEmpty()) {
+        throw new IllegalArgumentException(
+                "Customer cannot be deleted because consents exist");
+    }
+
+    customerRepository.delete(customer);
+}
 }
