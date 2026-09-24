@@ -14,6 +14,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "accounts")
@@ -23,15 +26,19 @@ public class BankAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String accountNumber;
+    @NotBlank(message = "Account number is required")
+@Column(nullable = false, unique = true)
+private String accountNumber;
 
-    @Column(nullable = false)
-    private BigDecimal balance;
+@NotNull(message = "Balance is required")
+@DecimalMin(value = "0.0", inclusive = true,
+        message = "Balance cannot be negative")
+@Column(nullable = false)
+private BigDecimal balance;
 
-    @Column(nullable = false)
-    private String accountType;
-
+@NotBlank(message = "Account type is required")
+@Column(nullable = false)
+private String accountType;
     @ManyToMany(mappedBy = "bankAccounts")
     private Set<Customer> customers = new HashSet<>();
 
