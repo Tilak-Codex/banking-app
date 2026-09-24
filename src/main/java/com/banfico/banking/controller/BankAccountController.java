@@ -40,6 +40,7 @@ public class BankAccountController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public BankAccountResponse createBankAccount(
             @Valid @RequestBody BankAccountRequest request) {
 
