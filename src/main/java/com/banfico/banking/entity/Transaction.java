@@ -15,6 +15,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "transactions")
@@ -24,12 +26,14 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private BigDecimal amount;
+    @NotNull(message = "Transaction amount is required")
+@DecimalMin(value = "0.01", message = "Transaction amount must be greater than zero")
+private BigDecimal amount;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TransactionType transactionType;
-
+@Enumerated(EnumType.STRING)
+@Column(nullable = false)
+@NotNull(message = "Transaction type is required")
+private TransactionType transactionType;
     private String description;
 
     private LocalDateTime transactionDate;
