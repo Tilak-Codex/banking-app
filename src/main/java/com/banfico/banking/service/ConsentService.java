@@ -171,4 +171,13 @@ public ConsentResponse updateConsent(
 
     return toResponse(updatedConsent);
 }
+public void deleteConsent(Long id) {
+
+    Consent consent = consentRepository.findById(id)
+            .orElseThrow(() ->
+                    new ConsentNotFoundException(
+                            "Consent not found"));
+
+    consentRepository.delete(consent);
+}
 }
