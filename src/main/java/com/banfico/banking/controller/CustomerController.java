@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.banfico.banking.entity.BankAccount;
 import com.banfico.banking.entity.Customer;
 import com.banfico.banking.service.CustomerService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -29,7 +30,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
+    public Customer createCustomer(@Valid @RequestBody Customer customer){
         return customerService.createCustomer(customer);
     }
 
@@ -45,8 +46,8 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public Customer updateCustomer(
-            @PathVariable Long id,
-            @RequestBody Customer customerDetails) {
+        @PathVariable Long id,
+        @Valid @RequestBody Customer customerDetails) {
 
         return customerService.updateCustomer(id, customerDetails);
     }
