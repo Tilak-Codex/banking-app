@@ -21,6 +21,7 @@ import com.banfico.banking.entity.BankAccount;
 import com.banfico.banking.entity.Customer;
 import com.banfico.banking.service.CustomerService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -33,6 +34,7 @@ public class CustomerController {
     }
 
     @PostMapping("/{customerId}/accounts/{accountId}")
+    @ResponseStatus(HttpStatus.CREATED)
 public BankAccountResponse addBankAccountToCustomer(
         @PathVariable Long customerId,
         @PathVariable Long accountId) {
