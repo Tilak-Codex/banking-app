@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.banfico.banking.dto.TransactionRequest;
+import com.banfico.banking.dto.TransactionResponse;
 import com.banfico.banking.entity.BankAccount;
 import com.banfico.banking.entity.Transaction;
 import com.banfico.banking.entity.TransactionType;
@@ -30,103 +32,100 @@ public class TransactionService {
     }
 
     @Transactional
-    public Transaction createTransaction(Transaction transaction) {
+    public TransactionResponse createTransaction(
+            TransactionRequest request) {
 
-        if (transaction.getBankAccount() == null
-                || transaction.getBankAccount().getId() == null) {
+        BankAccount bankAccount = bankAccountRepository
+                .findById(request.getBankAccountId())
+                .orElseThrow(() ->
+                        new BankAccountNotFoundException(
+                                "Bank account not found"));
 
-            throw new IllegalArgumentException(
-                    "Bank account is required");
-        }
-
-        BankAccount bankAccount = bankAccountRepository.findById(
-                transaction.getBankAccount().getId())
-                .orElseThrow(() -> new BankAccountNotFoundException(
-                        "Bank account not found"));
-
-        BigDecimal amount = transaction.getAmount();
-
-        if (amount == null
-                || amount.compareTo(BigDecimal.ZERO) <= 0) {
-
-            throw new IllegalArgumentException(
-                    "Transaction amount must be greater than zero");
-        }
-
-        if (transaction.getTransactionType() == null) {
-
-            throw new IllegalArgumentException(
-                    "Transaction type is required");
-        }
+        BigDecimal amount = request.getAmount();
 
         if (bankAccount.getBalance() == null) {
-
             throw new IllegalArgumentException(
                     "Account balance is not initialized");
         }
 
-        if (TransactionType.DEPOSIT
-                == transaction.getTransactionType()) {
+        if (TransactionType.DEPOSIT == request.getTransactionType()) {
 
             bankAccount.setBalance(
-                    bankAccount.getBalance().add(amount));
+                    bankAccount.getBalance().add(amount)
+            );
 
-        } else if (TransactionType.WITHDRAWAL
-                == transaction.getTransactionType()) {
+        } else if (TransactionType.WITHDRAWAL == request.getTransactionType()) {
 
             if (bankAccount.getBalance().compareTo(amount) < 0) {
-
                 throw new IllegalArgumentException(
                         "Insufficient account balance");
             }
 
             bankAccount.setBalance(
-                    bankAccount.getBalance().subtract(amount));
+                    bankAccount.getBalance().subtract(amount)
+            );
         }
 
-        transaction.setBankAccount(bankAccount);
+        Transaction transaction = new Transaction();
+
+        transaction.setAmount(amount);
+        transaction.setTransactionType(request.getTransactionType());
+        transaction.setDescription(request.getDescription());
         transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setBankAccount(bankAccount);
 
         bankAccountRepository.save(bankAccount);
 
-        return transactionRepository.save(transaction);
+        Transaction savedTransaction =
+                transactionRepository.save(transaction);
+
+        return toResponse(savedTransaction);
     }
 
-    public Transaction getTransactionById(Long id) {
+    public TransactionResponse getTransactionById(Long id) {
 
-        return transactionRepository.findById(id)
-                .orElseThrow(() -> new TransactionNotFoundException(
-                        "Transaction not found"));
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() ->
+                        new TransactionNotFoundException(
+                                "Transaction not found"));
+
+        return toResponse(transaction);
     }
 
-    public List<Transaction> getAllTransactions() {
+    public List<TransactionResponse> getAllTransactions() {
 
-        return transactionRepository.findAll();
+        return transactionRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public List<Transaction> getTransactionsByBankAccountId(
+    public List<TransactionResponse> getTransactionsByBankAccountId(
             Long bankAccountId) {
 
         bankAccountRepository.findById(bankAccountId)
-                .orElseThrow(() -> new BankAccountNotFoundException(
-                        "Bank account not found"));
+                .orElseThrow(() ->
+                        new BankAccountNotFoundException(
+                                "Bank account not found"));
 
         return transactionRepository
                 .findByBankAccountIdOrderByTransactionDateDesc(
-                        bankAccountId);
+                        bankAccountId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Transactional
-    public Transaction reverseTransaction(Long transactionId) {
+    public TransactionResponse reverseTransaction(Long transactionId) {
 
         Transaction originalTransaction =
                 transactionRepository.findById(transactionId)
-                        .orElseThrow(() -> new TransactionNotFoundException(
-                                "Transaction not found"));
+                        .orElseThrow(() ->
+                                new TransactionNotFoundException(
+                                        "Transaction not found"));
 
-        // Prevent the same transaction from being reversed twice
         if (originalTransaction.isReversed()) {
-
             throw new IllegalArgumentException(
                     "Transaction has already been reversed");
         }
@@ -137,38 +136,26 @@ public class TransactionService {
         BigDecimal amount =
                 originalTransaction.getAmount();
 
-        if (bankAccount == null) {
-
-            throw new IllegalArgumentException(
-                    "Transaction is not associated with a bank account");
-        }
-
-        if (bankAccount.getBalance() == null) {
-
-            throw new IllegalArgumentException(
-                    "Account balance is not initialized");
-        }
-
-        if (TransactionType.DEPOSIT
-                == originalTransaction.getTransactionType()) {
+        if (TransactionType.DEPOSIT ==
+                originalTransaction.getTransactionType()) {
 
             if (bankAccount.getBalance().compareTo(amount) < 0) {
-
                 throw new IllegalArgumentException(
                         "Insufficient balance to reverse transaction");
             }
 
             bankAccount.setBalance(
-                    bankAccount.getBalance().subtract(amount));
+                    bankAccount.getBalance().subtract(amount)
+            );
 
-        } else if (TransactionType.WITHDRAWAL
-                == originalTransaction.getTransactionType()) {
+        } else if (TransactionType.WITHDRAWAL ==
+                originalTransaction.getTransactionType()) {
 
             bankAccount.setBalance(
-                    bankAccount.getBalance().add(amount));
+                    bankAccount.getBalance().add(amount)
+            );
         }
 
-        // Create a new transaction representing the reversal
         Transaction reversalTransaction = new Transaction();
 
         reversalTransaction.setBankAccount(bankAccount);
@@ -178,22 +165,40 @@ public class TransactionService {
                 originalTransaction.getTransactionType()
                         == TransactionType.DEPOSIT
                         ? TransactionType.WITHDRAWAL
-                        : TransactionType.DEPOSIT);
+                        : TransactionType.DEPOSIT
+        );
 
         reversalTransaction.setDescription(
                 "Reversal of transaction "
-                        + originalTransaction.getId());
+                        + originalTransaction.getId()
+        );
 
         reversalTransaction.setTransactionDate(
-                LocalDateTime.now());
+                LocalDateTime.now()
+        );
 
-        // Mark the original transaction as reversed
         originalTransaction.setReversed(true);
 
         bankAccountRepository.save(bankAccount);
-
         transactionRepository.save(originalTransaction);
 
-        return transactionRepository.save(reversalTransaction);
+        Transaction savedReversal =
+                transactionRepository.save(reversalTransaction);
+
+        return toResponse(savedReversal);
+    }
+
+    private TransactionResponse toResponse(
+            Transaction transaction) {
+
+        return new TransactionResponse(
+                transaction.getId(),
+                transaction.getAmount(),
+                transaction.getTransactionType(),
+                transaction.getDescription(),
+                transaction.getTransactionDate(),
+                transaction.isReversed(),
+                transaction.getBankAccount().getId()
+        );
     }
 }
