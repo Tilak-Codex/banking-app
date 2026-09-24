@@ -136,4 +136,13 @@ public ResponseEntity<ErrorResponse> handleUnexpectedException(
             "An unexpected error occurred"
     );
 }
+@ExceptionHandler(DuplicateResourceException.class)
+public ResponseEntity<ErrorResponse> handleDuplicateResource(
+        DuplicateResourceException exception) {
+
+    return buildErrorResponse(
+            HttpStatus.CONFLICT,
+            exception.getMessage()
+    );
+}
 }

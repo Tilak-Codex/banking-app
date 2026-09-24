@@ -14,6 +14,7 @@ import com.banfico.banking.exception.BankAccountNotFoundException;
 import com.banfico.banking.exception.CustomerNotFoundException;
 import com.banfico.banking.repository.BankAccountRepository;
 import com.banfico.banking.repository.CustomerRepository;
+import com.banfico.banking.exception.DuplicateResourceException;
 
 @Service
 public class CustomerService {
@@ -31,59 +32,28 @@ public class CustomerService {
 
     public CustomerResponse createCustomer(CustomerRequest request) {
 
-        Customer customer = new Customer();
-
-        customer.setName(request.getName());
-        customer.setEmail(request.getEmail());
-        customer.setPhoneNumber(request.getPhoneNumber());
-
-        Customer savedCustomer = customerRepository.save(customer);
-
-        return toResponse(savedCustomer);
+    if (customerRepository.existsByEmail(request.getEmail())) {
+        throw new DuplicateResourceException(
+                "Customer with this email already exists");
     }
 
-    public CustomerResponse getCustomerById(Long id) {
+    if (customerRepository.existsByPhoneNumber(
+            request.getPhoneNumber())) {
 
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
-
-        return toResponse(customer);
+        throw new DuplicateResourceException(
+                "Customer with this phone number already exists");
     }
 
-    public List<CustomerResponse> getAllCustomers() {
+    Customer customer = new Customer();
 
-        return customerRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
+    customer.setName(request.getName());
+    customer.setEmail(request.getEmail());
+    customer.setPhoneNumber(request.getPhoneNumber());
 
-    public CustomerResponse updateCustomer(
-            Long id,
-            CustomerRequest request) {
+    Customer savedCustomer = customerRepository.save(customer);
 
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
-
-        customer.setName(request.getName());
-        customer.setEmail(request.getEmail());
-        customer.setPhoneNumber(request.getPhoneNumber());
-
-        Customer updatedCustomer = customerRepository.save(customer);
-
-        return toResponse(updatedCustomer);
-    }
-
-    public void deleteCustomer(Long id) {
-
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
-
-        customerRepository.delete(customer);
-    }
+    return toResponse(savedCustomer);
+}
 
     public BankAccountResponse addBankAccountToCustomer(
         Long customerId,
