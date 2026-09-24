@@ -178,6 +178,11 @@ public void deleteConsent(Long id) {
                     new ConsentNotFoundException(
                             "Consent not found"));
 
+    if (consent.getStatus() == ConsentStatus.APPROVED) {
+        throw new IllegalArgumentException(
+                "Approved consent cannot be deleted");
+    }
+
     consentRepository.delete(consent);
 }
 }
