@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "beneficiaries")
@@ -20,15 +21,17 @@ private Customer customer;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+@NotBlank(message = "Beneficiary name is required")
+@Column(nullable = false)
+private String name;
 
-    @Column(nullable = false)
-    private String name;
+@NotBlank(message = "Beneficiary account number is required")
+@Column(nullable = false)
+private String accountNumber;
 
-    @Column(nullable = false)
-    private String accountNumber;
-
-    @Column(nullable = false)
-    private String bankCode;
+@NotBlank(message = "Bank code is required")
+@Column(nullable = false)
+private String bankCode;
 
    
 
