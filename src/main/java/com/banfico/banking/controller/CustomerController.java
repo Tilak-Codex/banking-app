@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.banfico.banking.dto.CustomerRequest;
+import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.entity.BankAccount;
 import com.banfico.banking.entity.Customer;
 import com.banfico.banking.service.CustomerService;
@@ -30,27 +32,31 @@ public class CustomerController {
     }
 
     @PostMapping
-    public Customer createCustomer(@Valid @RequestBody Customer customer){
-        return customerService.createCustomer(customer);
-    }
+public CustomerResponse createCustomer(
+        @Valid @RequestBody CustomerRequest request) {
+
+    return customerService.createCustomer(request);
+}
 
     @GetMapping("/{id}")
-    public Customer getCustomerById(@PathVariable Long id) {
-        return customerService.getCustomerById(id);
-    }
+public CustomerResponse getCustomerById(@PathVariable Long id) {
+
+    return customerService.getCustomerById(id);
+}
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerService.getAllCustomers();
-    }
+public List<CustomerResponse> getAllCustomers() {
 
-    @PutMapping("/{id}")
-    public Customer updateCustomer(
+    return customerService.getAllCustomers();
+}
+
+   @PutMapping("/{id}")
+public CustomerResponse updateCustomer(
         @PathVariable Long id,
-        @Valid @RequestBody Customer customerDetails) {
+        @Valid @RequestBody CustomerRequest request) {
 
-        return customerService.updateCustomer(id, customerDetails);
-    }
+    return customerService.updateCustomer(id, request);
+}
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
