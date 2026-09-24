@@ -21,6 +21,7 @@ import com.banfico.banking.dto.TransactionResponse;
 import com.banfico.banking.entity.Customer;
 import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
+import com.banfico.banking.dto.BankAccountUpdateRequest;
 
 import jakarta.validation.Valid;
 
@@ -54,12 +55,12 @@ public class BankAccountController {
     }
 
     @PutMapping("/{id}")
-    public BankAccountResponse updateBankAccount(
-            @PathVariable Long id,
-            @Valid @RequestBody BankAccountRequest request) {
+public BankAccountResponse updateBankAccount(
+        @PathVariable Long id,
+        @Valid @RequestBody BankAccountUpdateRequest request) {
 
-        return bankAccountService.updateBankAccount(id, request);
-    }
+    return bankAccountService.updateBankAccount(id, request);
+}
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
