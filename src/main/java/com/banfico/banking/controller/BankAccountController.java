@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.banfico.banking.dto.BankAccountRequest;
 import com.banfico.banking.dto.BankAccountResponse;
+import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.dto.TransactionResponse;
 import com.banfico.banking.entity.Customer;
 import com.banfico.banking.service.BankAccountService;
@@ -74,9 +75,9 @@ public class BankAccountController {
     }
 
     @GetMapping("/{accountId}/customers")
-    public Set<Customer> getCustomersByBankAccountId(
-            @PathVariable Long accountId) {
+public Set<CustomerResponse> getCustomersByBankAccountId(
+        @PathVariable Long accountId) {
 
-        return bankAccountService.getCustomersByBankAccountId(accountId);
-    }
+    return bankAccountService.getCustomersByBankAccountId(accountId);
+}
 }

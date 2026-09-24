@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.dao.DataIntegrityViolationException;
+
 @RestControllerAdvice
 // This class handles exceptions thrown by REST controllers across the application
 public class GlobalExceptionHandler {
@@ -80,5 +82,13 @@ public ResponseEntity<Map<String, String>> handleValidationErrors(
     return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(errors);
+}
+@ExceptionHandler(DataIntegrityViolationException.class)
+public ResponseEntity<String> handleDataIntegrityViolation(
+        DataIntegrityViolationException exception) {
+
+    return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body("A record with the provided unique value already exists");
 }
 }
