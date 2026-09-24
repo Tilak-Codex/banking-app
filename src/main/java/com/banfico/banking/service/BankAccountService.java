@@ -11,6 +11,7 @@ import com.banfico.banking.entity.BankAccount;
 import com.banfico.banking.entity.Customer;
 import com.banfico.banking.exception.BankAccountNotFoundException;
 import com.banfico.banking.repository.BankAccountRepository;
+import com.banfico.banking.dto.CustomerResponse;
 
 @Service
 public class BankAccountService {
@@ -78,14 +79,24 @@ public class BankAccountService {
         bankAccountRepository.delete(bankAccount);
     }
 
-    public Set<Customer> getCustomersByBankAccountId(Long accountId) {
+    public Set<CustomerResponse> getCustomersByBankAccountId(
+        Long accountId) {
 
-        BankAccount bankAccount = bankAccountRepository.findById(accountId)
-                .orElseThrow(() ->
-                        new BankAccountNotFoundException("Bank account not found"));
+    BankAccount bankAccount = bankAccountRepository.findById(accountId)
+            .orElseThrow(() ->
+                    new BankAccountNotFoundException(
+                            "Bank account not found"));
 
-        return bankAccount.getCustomers();
-    }
+    return bankAccount.getCustomers()
+            .stream()
+            .map(customer -> new CustomerResponse(
+                    customer.getId(),
+                    customer.getName(),
+                    customer.getEmail(),
+                    customer.getPhoneNumber()
+            ))
+            .collect(java.util.stream.Collectors.toSet());
+}
 
     private BankAccountResponse toResponse(BankAccount bankAccount) {
 
