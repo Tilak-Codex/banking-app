@@ -14,6 +14,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "customers")
@@ -25,15 +28,22 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @NotBlank(message = "Name is required")
+@Column(nullable = false)
+private String name;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+@NotBlank(message = "Email is required")
+@Email(message = "Invalid email format")
+@Column(nullable = false, unique = true)
+private String email;
 
-    @Column(nullable = false, unique = true)
-    private String phoneNumber;
-
+@NotBlank(message = "Phone number is required")
+@Pattern(
+    regexp = "^[0-9]{10}$",
+    message = "Phone number must contain exactly 10 digits"
+)
+@Column(nullable = false, unique = true)
+private String phoneNumber;
     @ManyToMany
     @JoinTable(name = "customer_bank_accounts", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "bank_account_id"))
     private Set<BankAccount> bankAccounts = new HashSet<>();
