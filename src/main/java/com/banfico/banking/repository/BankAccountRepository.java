@@ -4,6 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.banfico.banking.entity.BankAccount;
 
-public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
+public interface BankAccountRepository
+        extends JpaRepository<BankAccount, Long> {
 
+    boolean existsByAccountNumber(String accountNumber);
+
+    boolean existsByAccountNumberAndIdNot(
+            String accountNumber,
+            Long id);
 }

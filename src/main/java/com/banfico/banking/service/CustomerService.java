@@ -129,4 +129,43 @@ return new BankAccountResponse(
                 customer.getPhoneNumber()
         );
     }
+    public CustomerResponse updateCustomer(
+        Long id,
+        CustomerRequest request) {
+
+    Customer customer = customerRepository.findById(id)
+            .orElseThrow(() ->
+                    new CustomerNotFoundException("Customer not found"));
+
+    if (customerRepository.existsByEmailAndIdNot(
+            request.getEmail(), id)) {
+
+        throw new DuplicateResourceException(
+                "Customer with this email already exists");
+    }
+
+    if (customerRepository.existsByPhoneNumberAndIdNot(
+            request.getPhoneNumber(), id)) {
+
+        throw new DuplicateResourceException(
+                "Customer with this phone number already exists");
+    }
+
+    customer.setName(request.getName());
+    customer.setEmail(request.getEmail());
+    customer.setPhoneNumber(request.getPhoneNumber());
+
+    Customer updatedCustomer =
+            customerRepository.save(customer);
+
+    return toResponse(updatedCustomer);
+}
+    public void deleteCustomer(Long id) {
+
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() ->
+                        new CustomerNotFoundException("Customer not found"));
+
+        customerRepository.delete(customer);
+    }
 }

@@ -6,7 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.banfico.banking.entity.Consent;
 
-public interface ConsentRepository extends JpaRepository<Consent, Long> {
+public interface ConsentRepository
+        extends JpaRepository<Consent, Long> {
 
     List<Consent> findByCustomerId(Long customerId);
+
+    boolean existsByConsentReference(String consentReference);
+
+    boolean existsByConsentReferenceAndIdNot(
+            String consentReference,
+            Long id);
 }

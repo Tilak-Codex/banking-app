@@ -12,6 +12,7 @@ import com.banfico.banking.entity.ConsentStatus;
 import com.banfico.banking.entity.Customer;
 import com.banfico.banking.exception.ConsentNotFoundException;
 import com.banfico.banking.exception.CustomerNotFoundException;
+import com.banfico.banking.exception.DuplicateResourceException;
 import com.banfico.banking.repository.ConsentRepository;
 import com.banfico.banking.repository.CustomerRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,26 +32,33 @@ public class ConsentService {
     }
 
     public ConsentResponse createConsent(
-            Long customerId,
-            ConsentRequest request) {
+        Long customerId,
+        ConsentRequest request) {
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException(
-                                "Customer not found"));
+    if (consentRepository.existsByConsentReference(
+            request.getConsentReference())) {
 
-        Consent consent = new Consent();
-
-        consent.setConsentReference(request.getConsentReference());
-        consent.setPurpose(request.getPurpose());
-        consent.setCustomer(customer);
-        consent.setStatus(ConsentStatus.PENDING);
-        consent.setCreatedAt(LocalDateTime.now());
-
-        Consent savedConsent = consentRepository.save(consent);
-
-        return toResponse(savedConsent);
+        throw new DuplicateResourceException(
+                "Consent with this reference already exists");
     }
+
+    Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() ->
+                    new CustomerNotFoundException(
+                            "Customer not found"));
+
+    Consent consent = new Consent();
+
+    consent.setConsentReference(request.getConsentReference());
+    consent.setPurpose(request.getPurpose());
+    consent.setCustomer(customer);
+    consent.setStatus(ConsentStatus.PENDING);
+    consent.setCreatedAt(LocalDateTime.now());
+
+    Consent savedConsent = consentRepository.save(consent);
+
+    return toResponse(savedConsent);
+}
 
     public ConsentResponse getConsentById(Long id) {
 
@@ -137,4 +145,30 @@ public class ConsentService {
                 consent.getCustomer().getId()
         );
     }
+    @Transactional
+public ConsentResponse updateConsent(
+        Long id,
+        ConsentRequest request) {
+
+    Consent consent = consentRepository.findById(id)
+            .orElseThrow(() ->
+                    new ConsentNotFoundException(
+                            "Consent not found"));
+
+    if (consentRepository.existsByConsentReferenceAndIdNot(
+            request.getConsentReference(), id)) {
+
+        throw new DuplicateResourceException(
+                "Consent with this reference already exists");
+    }
+
+    consent.setConsentReference(request.getConsentReference());
+    consent.setPurpose(request.getPurpose());
+    consent.setUpdatedAt(LocalDateTime.now());
+
+    Consent updatedConsent =
+            consentRepository.save(consent);
+
+    return toResponse(updatedConsent);
+}
 }
