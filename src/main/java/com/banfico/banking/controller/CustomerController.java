@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.banfico.banking.dto.BankAccountResponse;
 import com.banfico.banking.dto.CustomerRequest;
 import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.entity.BankAccount;
@@ -31,61 +32,32 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @PostMapping
-public CustomerResponse createCustomer(
-        @Valid @RequestBody CustomerRequest request) {
-
-    return customerService.createCustomer(request);
-}
-
-    @GetMapping("/{id}")
-public CustomerResponse getCustomerById(@PathVariable Long id) {
-
-    return customerService.getCustomerById(id);
-}
-
-    @GetMapping
-public List<CustomerResponse> getAllCustomers() {
-
-    return customerService.getAllCustomers();
-}
-
-   @PutMapping("/{id}")
-public CustomerResponse updateCustomer(
-        @PathVariable Long id,
-        @Valid @RequestBody CustomerRequest request) {
-
-    return customerService.updateCustomer(id, request);
-}
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCustomer(@PathVariable Long id) {
-        customerService.deleteCustomer(id);
-    }
-
     @PostMapping("/{customerId}/accounts/{accountId}")
-    public Customer addBankAccountToCustomer(
-            @PathVariable Long customerId,
-            @PathVariable Long accountId) {
+public BankAccountResponse addBankAccountToCustomer(
+        @PathVariable Long customerId,
+        @PathVariable Long accountId) {
 
-        return customerService.addBankAccountToCustomer(
-                customerId, accountId);
-    }
+    return customerService.addBankAccountToCustomer(
+            customerId,
+            accountId
+    );
+}
 
-    @DeleteMapping("/{customerId}/accounts/{accountId}")
-    public Customer removeBankAccountFromCustomer(
-            @PathVariable Long customerId,
-            @PathVariable Long accountId) {
+@DeleteMapping("/{customerId}/accounts/{accountId}")
+public BankAccountResponse removeBankAccountFromCustomer(
+        @PathVariable Long customerId,
+        @PathVariable Long accountId) {
 
-        return customerService.removeBankAccountFromCustomer(
-                customerId, accountId);
-    }
+    return customerService.removeBankAccountFromCustomer(
+            customerId,
+            accountId
+    );
+}
 
-    @GetMapping("/{customerId}/accounts")
-    public Set<BankAccount> getBankAccountsByCustomerId(
-            @PathVariable Long customerId) {
+@GetMapping("/{customerId}/accounts")
+public Set<BankAccountResponse> getBankAccountsByCustomerId(
+        @PathVariable Long customerId) {
 
-        return customerService.getBankAccountsByCustomerId(customerId);
-    }
+    return customerService.getBankAccountsByCustomerId(customerId);
+}
 }

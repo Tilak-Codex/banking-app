@@ -16,9 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.banfico.banking.dto.BankAccountRequest;
 import com.banfico.banking.dto.BankAccountResponse;
-import com.banfico.banking.entity.BankAccount;
+import com.banfico.banking.dto.TransactionResponse;
 import com.banfico.banking.entity.Customer;
-import com.banfico.banking.entity.Transaction;
 import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
 
@@ -34,6 +33,7 @@ public class BankAccountController {
     public BankAccountController(
             BankAccountService bankAccountService,
             TransactionService transactionService) {
+
         this.bankAccountService = bankAccountService;
         this.transactionService = transactionService;
     }
@@ -45,13 +45,6 @@ public class BankAccountController {
         return bankAccountService.createBankAccount(request);
     }
 
-    @GetMapping("/{id}")
-    public BankAccountResponse getBankAccountById(
-            @PathVariable Long id) {
-
-        return bankAccountService.getBankAccountById(id);
-    }
-
     @GetMapping
     public List<BankAccountResponse> getAllBankAccounts() {
 
@@ -59,12 +52,12 @@ public class BankAccountController {
     }
 
     @PutMapping("/{id}")
-public BankAccountResponse updateBankAccount(
-        @PathVariable Long id,
-        @Valid @RequestBody BankAccountRequest request) {
+    public BankAccountResponse updateBankAccount(
+            @PathVariable Long id,
+            @Valid @RequestBody BankAccountRequest request) {
 
-    return bankAccountService.updateBankAccount(id, request);
-}
+        return bankAccountService.updateBankAccount(id, request);
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -74,8 +67,9 @@ public BankAccountResponse updateBankAccount(
     }
 
     @GetMapping("/{accountId}/transactions")
-    public List<Transaction> getTransactionsByBankAccountId(
+    public List<TransactionResponse> getTransactionsByBankAccountId(
             @PathVariable Long accountId) {
+
         return transactionService.getTransactionsByBankAccountId(accountId);
     }
 
