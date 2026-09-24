@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.banfico.banking.entity.Transaction;
+import com.banfico.banking.dto.TransactionRequest;
+import com.banfico.banking.dto.TransactionResponse;
 import com.banfico.banking.service.TransactionService;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -24,23 +26,29 @@ public class TransactionController {
     }
 
     @PostMapping
-public Transaction createTransaction(
-        @Valid @RequestBody Transaction transaction) {
+    public TransactionResponse createTransaction(
+            @Valid @RequestBody TransactionRequest request) {
 
-    return transactionService.createTransaction(transaction);
-}
+        return transactionService.createTransaction(request);
+    }
+
     @GetMapping("/{id}")
-    public Transaction getTransactionById(@PathVariable Long id) {
+    public TransactionResponse getTransactionById(
+            @PathVariable Long id) {
+
         return transactionService.getTransactionById(id);
     }
 
     @GetMapping
-    public List<Transaction> getAllTransactions() {
+    public List<TransactionResponse> getAllTransactions() {
+
         return transactionService.getAllTransactions();
     }
-    @PostMapping("/{id}/reverse")
-public Transaction reverseTransaction(@PathVariable Long id) {
 
-    return transactionService.reverseTransaction(id);
-}
+    @PostMapping("/{id}/reverse")
+    public TransactionResponse reverseTransaction(
+            @PathVariable Long id) {
+
+        return transactionService.reverseTransaction(id);
+    }
 }
