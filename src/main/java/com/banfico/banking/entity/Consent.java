@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "consents")
@@ -21,11 +22,13 @@ public class Consent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String consentReference;
+    @NotBlank(message = "Consent reference is required")
+@Column(nullable = false, unique = true)
+private String consentReference;
 
-    @Column(nullable = false)
-    private String purpose;
+@NotBlank(message = "Consent purpose is required")
+@Column(nullable = false)
+private String purpose;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
