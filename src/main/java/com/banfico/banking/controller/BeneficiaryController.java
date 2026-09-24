@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.banfico.banking.entity.Beneficiary;
+import com.banfico.banking.dto.BeneficiaryRequest;
+import com.banfico.banking.dto.BeneficiaryResponse;
 import com.banfico.banking.service.BeneficiaryService;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -28,42 +30,45 @@ public class BeneficiaryController {
     }
 
     @PostMapping("/customers/{customerId}")
-public Beneficiary createBeneficiary(
-        @PathVariable Long customerId,
-        @Valid @RequestBody Beneficiary beneficiary) {
+    public BeneficiaryResponse createBeneficiary(
+            @PathVariable Long customerId,
+            @Valid @RequestBody BeneficiaryRequest request) {
 
-    return beneficiaryService.createBeneficiary(customerId, beneficiary);
-}
+        return beneficiaryService.createBeneficiary(customerId, request);
+    }
 
     @GetMapping("/{id}")
-    public Beneficiary getBeneficiaryById(
+    public BeneficiaryResponse getBeneficiaryById(
             @PathVariable Long id) {
 
         return beneficiaryService.getBeneficiaryById(id);
     }
 
     @GetMapping
-    public List<Beneficiary> getAllBeneficiaries() {
+    public List<BeneficiaryResponse> getAllBeneficiaries() {
+
         return beneficiaryService.getAllBeneficiaries();
     }
 
-    @PutMapping("/{id}")
-public Beneficiary updateBeneficiary(
-        @PathVariable Long id,
-        @Valid @RequestBody Beneficiary beneficiaryDetails) {
+    @GetMapping("/customers/{customerId}")
+    public List<BeneficiaryResponse> getBeneficiariesByCustomerId(
+            @PathVariable Long customerId) {
 
-    return beneficiaryService.updateBeneficiary(id, beneficiaryDetails);
-}
+        return beneficiaryService.getBeneficiariesByCustomerId(customerId);
+    }
+
+    @PutMapping("/{id}")
+    public BeneficiaryResponse updateBeneficiary(
+            @PathVariable Long id,
+            @Valid @RequestBody BeneficiaryRequest request) {
+
+        return beneficiaryService.updateBeneficiary(id, request);
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBeneficiary(@PathVariable Long id) {
+
         beneficiaryService.deleteBeneficiary(id);
     }
-    @GetMapping("/customers/{customerId}")
-public List<Beneficiary> getBeneficiariesByCustomerId(
-        @PathVariable Long customerId) {
-
-    return beneficiaryService.getBeneficiariesByCustomerId(customerId);
-}
 }
