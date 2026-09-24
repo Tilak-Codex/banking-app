@@ -20,6 +20,8 @@ import com.banfico.banking.entity.Transaction;
 import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/accounts")
 public class BankAccountController {
@@ -35,9 +37,11 @@ public class BankAccountController {
     }
 
     @PostMapping
-    public BankAccount createBankAccount(@RequestBody BankAccount bankAccount) {
-        return bankAccountService.createBankAccount(bankAccount);
-    }
+public BankAccount createBankAccount(
+        @Valid @RequestBody BankAccount bankAccount) {
+
+    return bankAccountService.createBankAccount(bankAccount);
+}
 
     @GetMapping("/{id}")
     public BankAccount getBankAccountById(@PathVariable Long id) {
@@ -50,12 +54,12 @@ public class BankAccountController {
     }
 
     @PutMapping("/{id}")
-    public BankAccount updateBankAccount(
-            @PathVariable Long id,
-            @RequestBody BankAccount accountDetails) {
-        return bankAccountService.updateBankAccount(id, accountDetails);
-    }
+public BankAccount updateBankAccount(
+        @PathVariable Long id,
+        @Valid @RequestBody BankAccount accountDetails) {
 
+    return bankAccountService.updateBankAccount(id, accountDetails);
+}
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBankAccount(@PathVariable Long id) {
