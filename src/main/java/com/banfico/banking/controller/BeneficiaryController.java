@@ -30,6 +30,7 @@ public class BeneficiaryController {
     }
 
     @PostMapping("/customers/{customerId}")
+    @ResponseStatus(HttpStatus.CREATED)
     public BeneficiaryResponse createBeneficiary(
             @PathVariable Long customerId,
             @Valid @RequestBody BeneficiaryRequest request) {
