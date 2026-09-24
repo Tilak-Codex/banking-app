@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import com.banfico.banking.entity.Consent;
 import com.banfico.banking.service.ConsentService;
@@ -26,12 +27,12 @@ public class ConsentController {
     }
 
     @PostMapping("/customers/{customerId}")
-    public Consent createConsent(
-            @PathVariable Long customerId,
-            @RequestBody Consent consent) {
+public Consent createConsent(
+        @PathVariable Long customerId,
+        @Valid @RequestBody Consent consent) {
 
-        return consentService.createConsent(customerId, consent);
-    }
+    return consentService.createConsent(customerId, consent);
+}
 
     @GetMapping("/{id}")
     public Consent getConsentById(@PathVariable Long id) {
