@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.banfico.banking.entity.Transaction;
 import com.banfico.banking.service.TransactionService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -23,10 +24,11 @@ public class TransactionController {
     }
 
     @PostMapping
-    public Transaction createTransaction(@RequestBody Transaction transaction) {
-        return transactionService.createTransaction(transaction);
-    }
+public Transaction createTransaction(
+        @Valid @RequestBody Transaction transaction) {
 
+    return transactionService.createTransaction(transaction);
+}
     @GetMapping("/{id}")
     public Transaction getTransactionById(@PathVariable Long id) {
         return transactionService.getTransactionById(id);

@@ -47,7 +47,7 @@ public Beneficiary createBeneficiary(
         return beneficiaryService.getAllBeneficiaries();
     }
 
-    @@PutMapping("/{id}")
+    @PutMapping("/{id}")
 public Beneficiary updateBeneficiary(
         @PathVariable Long id,
         @Valid @RequestBody Beneficiary beneficiaryDetails) {
