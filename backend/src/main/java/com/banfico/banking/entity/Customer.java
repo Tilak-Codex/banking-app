@@ -24,6 +24,8 @@ public class Customer {
     @OneToMany(mappedBy = "customer")
     @JsonManagedReference
     private Set<Beneficiary> beneficiaries = new HashSet<>();
+    @OneToMany(mappedBy = "customer")
+private Set<Consent> consents = new HashSet<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -97,5 +99,11 @@ private String phoneNumber;
     public void setBeneficiaries(Set<Beneficiary> beneficiaries) {
         this.beneficiaries = beneficiaries;
     }
+public Set<Consent> getConsents() {
+    return consents;
+}
 
+public void setConsents(Set<Consent> consents) {
+    this.consents = consents;
+}
 }

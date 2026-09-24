@@ -14,6 +14,9 @@ import com.banfico.banking.exception.BankAccountNotFoundException;
 import com.banfico.banking.exception.CustomerNotFoundException;
 import com.banfico.banking.repository.BankAccountRepository;
 import com.banfico.banking.repository.CustomerRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.banfico.banking.exception.DuplicateResourceException;
 
 @Service
