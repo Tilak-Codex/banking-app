@@ -13,10 +13,14 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "customers")
 public class Customer {
+    @OneToMany(mappedBy = "customer")
+    @JsonManagedReference
+    private Set<Beneficiary> beneficiaries = new HashSet<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,8 +38,7 @@ public class Customer {
     @JoinTable(name = "customer_bank_accounts", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "bank_account_id"))
     private Set<BankAccount> bankAccounts = new HashSet<>();
 
-    @OneToMany(mappedBy = "customer")
-    private Set<Beneficiary> beneficiaries = new HashSet<>();
+    
 
     public Long getId() {
         return id;
@@ -85,6 +88,4 @@ public class Customer {
         this.beneficiaries = beneficiaries;
     }
 
-
-    
 }

@@ -4,16 +4,26 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.banfico.banking.entity.BankAccount;
 import com.banfico.banking.entity.Customer;
+import com.banfico.banking.exception.BankAccountNotFoundException;
 import com.banfico.banking.exception.CustomerNotFoundException;
 import com.banfico.banking.repository.CustomerRepository;
+import com.banfico.banking.entity.BankAccount;
+import com.banfico.banking.exception.BankAccountNotFoundException;
+import com.banfico.banking.repository.BankAccountRepository;
 
 @Service
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final BankAccountRepository bankAccountRepository;
 
-    public CustomerService(CustomerRepository customerRepository) {
+    public CustomerService(
+            CustomerRepository customerRepository,
+            BankAccountRepository bankAccountRepository) {
+
         this.customerRepository = customerRepository;
+        this.bankAccountRepository = bankAccountRepository;
     }
 
     public Customer createCustomer(Customer customer) {
@@ -43,10 +53,45 @@ public class CustomerService {
 
         return customerRepository.save(customer);
     }
-    public void deleteCustomer(Long id) {
-    Customer customer = customerRepository.findById(id)
-            .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
 
-    customerRepository.delete(customer);
-}
+    public void deleteCustomer(Long id) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
+
+        customerRepository.delete(customer);
+    }
+
+    public Customer addBankAccountToCustomer(
+            Long customerId,
+            Long accountId) {
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException(
+                        "Customer not found"));
+
+        BankAccount bankAccount = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new BankAccountNotFoundException(
+                        "Bank account not found"));
+
+        customer.getBankAccounts().add(bankAccount);
+
+        return customerRepository.save(customer);
+    }
+
+    public Customer removeBankAccountFromCustomer(
+            Long customerId,
+            Long accountId) {
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException(
+                        "Customer not found"));
+
+        BankAccount bankAccount = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new BankAccountNotFoundException(
+                        "Bank account not found"));
+
+        customer.getBankAccounts().remove(bankAccount);
+
+        return customerRepository.save(customer);
+    }
 }

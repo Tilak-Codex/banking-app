@@ -8,11 +8,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "beneficiaries")
 public class Beneficiary {
-
+@ManyToOne
+@JoinColumn(name = "customer_id", nullable = false)
+@JsonBackReference
+private Customer customer;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,9 +30,7 @@ public class Beneficiary {
     @Column(nullable = false)
     private String bankCode;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+   
 
     public Long getId() {
         return id;

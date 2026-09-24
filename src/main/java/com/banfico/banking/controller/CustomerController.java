@@ -55,4 +55,20 @@ public class CustomerController {
     public void deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
     }
+    @PostMapping("/{customerId}/accounts/{accountId}")
+public Customer addBankAccountToCustomer(
+        @PathVariable Long customerId,
+        @PathVariable Long accountId) {
+
+    return customerService.addBankAccountToCustomer(
+            customerId, accountId);
+}
+@DeleteMapping("/{customerId}/accounts/{accountId}")
+public Customer removeBankAccountFromCustomer(
+        @PathVariable Long customerId,
+        @PathVariable Long accountId) {
+
+    return customerService.removeBankAccountFromCustomer(
+            customerId, accountId);
+}
 }

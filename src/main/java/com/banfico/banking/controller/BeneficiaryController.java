@@ -61,4 +61,10 @@ public class BeneficiaryController {
     public void deleteBeneficiary(@PathVariable Long id) {
         beneficiaryService.deleteBeneficiary(id);
     }
+    @GetMapping("/customers/{customerId}")
+public List<Beneficiary> getBeneficiariesByCustomerId(
+        @PathVariable Long customerId) {
+
+    return beneficiaryService.getBeneficiariesByCustomerId(customerId);
+}
 }

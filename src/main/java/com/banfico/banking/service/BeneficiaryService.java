@@ -72,4 +72,12 @@ public class BeneficiaryService {
 
         beneficiaryRepository.delete(beneficiary);
     }
+    public List<Beneficiary> getBeneficiariesByCustomerId(Long customerId) {
+
+    customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(
+                    "Customer not found"));
+
+    return beneficiaryRepository.findByCustomerId(customerId);
+}
 }

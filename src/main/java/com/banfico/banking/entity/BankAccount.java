@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +18,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "accounts")
 public class BankAccount {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,12 +32,11 @@ public class BankAccount {
     @Column(nullable = false)
     private String accountType;
 
-    @ManyToMany(mappedBy = "bankAccounts") // Bidirectional Relationship with Customer and mapped using the
-                                           // "bankAccounts" field in Customer
+    @ManyToMany(mappedBy = "bankAccounts")
     private Set<Customer> customers = new HashSet<>();
 
-    @OneToMany(mappedBy = "bankAccount") // MappedBy will come in non-owning side of the relationship, which is the
-                                         // Transaction entity in this case
+    @OneToMany(mappedBy = "bankAccount")
+    @JsonManagedReference
     private Set<Transaction> transactions = new HashSet<>();
 
     public Long getId() {
@@ -84,6 +86,4 @@ public class BankAccount {
     public void setTransactions(Set<Transaction> transactions) {
         this.transactions = transactions;
     }
-
-    
 }

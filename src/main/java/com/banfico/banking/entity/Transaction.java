@@ -3,6 +3,8 @@ package com.banfico.banking.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,9 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 
 @Entity
 @Table(name = "transactions")
@@ -37,6 +36,7 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "bank_account_id", nullable = false)
+    @JsonBackReference
     private BankAccount bankAccount;
 
     public Long getId() {
@@ -55,13 +55,13 @@ public class Transaction {
         this.amount = amount;
     }
 
-   public TransactionType getTransactionType() {
-    return transactionType;
-}
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
 
-public void setTransactionType(TransactionType transactionType) {
-    this.transactionType = transactionType;
-}
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
 
     public String getDescription() {
         return description;
@@ -86,5 +86,4 @@ public void setTransactionType(TransactionType transactionType) {
     public void setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
     }
-
 }
