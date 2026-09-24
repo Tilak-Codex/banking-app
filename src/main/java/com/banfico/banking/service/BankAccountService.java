@@ -12,6 +12,7 @@ import com.banfico.banking.entity.Customer;
 import com.banfico.banking.exception.BankAccountNotFoundException;
 import com.banfico.banking.repository.BankAccountRepository;
 import com.banfico.banking.dto.CustomerResponse;
+import com.banfico.banking.dto.BankAccountUpdateRequest;
 
 @Service
 public class BankAccountService {
@@ -53,22 +54,22 @@ public class BankAccountService {
     }
 
     public BankAccountResponse updateBankAccount(
-            Long id,
-            BankAccountRequest request) {
+        Long id,
+        BankAccountUpdateRequest request) {
 
-        BankAccount bankAccount = bankAccountRepository.findById(id)
-                .orElseThrow(() ->
-                        new BankAccountNotFoundException("Bank account not found"));
+    BankAccount bankAccount = bankAccountRepository.findById(id)
+            .orElseThrow(() ->
+                    new BankAccountNotFoundException(
+                            "Bank account not found"));
 
-        bankAccount.setAccountNumber(request.getAccountNumber());
-        bankAccount.setBalance(request.getBalance());
-        bankAccount.setAccountType(request.getAccountType());
+    bankAccount.setAccountNumber(request.getAccountNumber());
+    bankAccount.setAccountType(request.getAccountType());
 
-        BankAccount updatedAccount =
-                bankAccountRepository.save(bankAccount);
+    BankAccount updatedAccount =
+            bankAccountRepository.save(bankAccount);
 
-        return toResponse(updatedAccount);
-    }
+    return toResponse(updatedAccount);
+}
 
     public void deleteBankAccount(Long id) {
 
