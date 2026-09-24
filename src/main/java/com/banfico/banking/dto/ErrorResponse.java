@@ -1,6 +1,7 @@
 package com.banfico.banking.dto;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public class ErrorResponse {
 
@@ -8,6 +9,7 @@ public class ErrorResponse {
     private int status;
     private String error;
     private String message;
+    private Map<String, String> validationErrors;
 
     public ErrorResponse() {
     }
@@ -24,6 +26,20 @@ public class ErrorResponse {
         this.message = message;
     }
 
+    public ErrorResponse(
+            LocalDateTime timestamp,
+            int status,
+            String error,
+            String message,
+            Map<String, String> validationErrors) {
+
+        this.timestamp = timestamp;
+        this.status = status;
+        this.error = error;
+        this.message = message;
+        this.validationErrors = validationErrors;
+    }
+
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
@@ -38,5 +54,9 @@ public class ErrorResponse {
 
     public String getMessage() {
         return message;
+    }
+
+    public Map<String, String> getValidationErrors() {
+        return validationErrors;
     }
 }
