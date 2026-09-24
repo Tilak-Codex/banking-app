@@ -3,13 +3,19 @@ package com.banfico.banking.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 @Table(name = "transactions")
@@ -21,7 +27,9 @@ public class Transaction {
 
     private BigDecimal amount;
 
-    private String transactionType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TransactionType transactionType;
 
     private String description;
 
@@ -47,13 +55,13 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public String getTransactionType() {
-        return transactionType;
-    }
+   public TransactionType getTransactionType() {
+    return transactionType;
+}
 
-    public void setTransactionType(String transactionType) {
-        this.transactionType = transactionType;
-    }
+public void setTransactionType(TransactionType transactionType) {
+    this.transactionType = transactionType;
+}
 
     public String getDescription() {
         return description;
@@ -79,5 +87,4 @@ public class Transaction {
         this.bankAccount = bankAccount;
     }
 
-    
 }
