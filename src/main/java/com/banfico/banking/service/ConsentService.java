@@ -14,6 +14,7 @@ import com.banfico.banking.exception.ConsentNotFoundException;
 import com.banfico.banking.exception.CustomerNotFoundException;
 import com.banfico.banking.repository.ConsentRepository;
 import com.banfico.banking.repository.CustomerRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ConsentService {
@@ -82,7 +83,8 @@ public class ConsentService {
                 .map(this::toResponse)
                 .toList();
     }
-
+    
+    @Transactional
     public ConsentResponse approveConsent(Long id) {
 
         Consent consent = consentRepository.findById(id)
@@ -102,7 +104,7 @@ public class ConsentService {
 
         return toResponse(updatedConsent);
     }
-
+    @Transactional 
     public ConsentResponse rejectConsent(Long id) {
 
         Consent consent = consentRepository.findById(id)

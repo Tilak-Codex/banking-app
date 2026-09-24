@@ -27,7 +27,11 @@ public class Transaction {
     private Long id;
 
     @NotNull(message = "Transaction amount is required")
-@DecimalMin(value = "0.01", message = "Transaction amount must be greater than zero")
+@DecimalMin(
+        value = "0.01",
+        message = "Transaction amount must be greater than zero"
+)
+@Column(nullable = false)
 private BigDecimal amount;
 
 @Enumerated(EnumType.STRING)
@@ -36,7 +40,9 @@ private BigDecimal amount;
 private TransactionType transactionType;
     private String description;
 
-    private LocalDateTime transactionDate;
+    @Column(nullable = false)
+private LocalDateTime transactionDate;
+   
     @Column(nullable = false)
     private boolean reversed = false;
 
