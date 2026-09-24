@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.banfico.banking.dto.BankAccountRequest;
+import com.banfico.banking.dto.BankAccountResponse;
 import com.banfico.banking.entity.BankAccount;
 import com.banfico.banking.entity.Customer;
 import com.banfico.banking.entity.Transaction;
@@ -37,32 +39,37 @@ public class BankAccountController {
     }
 
     @PostMapping
-public BankAccount createBankAccount(
-        @Valid @RequestBody BankAccount bankAccount) {
+    public BankAccountResponse createBankAccount(
+            @Valid @RequestBody BankAccountRequest request) {
 
-    return bankAccountService.createBankAccount(bankAccount);
-}
+        return bankAccountService.createBankAccount(request);
+    }
 
     @GetMapping("/{id}")
-    public BankAccount getBankAccountById(@PathVariable Long id) {
+    public BankAccountResponse getBankAccountById(
+            @PathVariable Long id) {
+
         return bankAccountService.getBankAccountById(id);
     }
 
     @GetMapping
-    public List<BankAccount> getAllBankAccounts() {
+    public List<BankAccountResponse> getAllBankAccounts() {
+
         return bankAccountService.getAllBankAccounts();
     }
 
     @PutMapping("/{id}")
-public BankAccount updateBankAccount(
+public BankAccountResponse updateBankAccount(
         @PathVariable Long id,
-        @Valid @RequestBody BankAccount accountDetails) {
+        @Valid @RequestBody BankAccountRequest request) {
 
-    return bankAccountService.updateBankAccount(id, accountDetails);
+    return bankAccountService.updateBankAccount(id, request);
 }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBankAccount(@PathVariable Long id) {
+
         bankAccountService.deleteBankAccount(id);
     }
 
