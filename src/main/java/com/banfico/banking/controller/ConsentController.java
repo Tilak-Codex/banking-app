@@ -3,6 +3,7 @@ package com.banfico.banking.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -76,5 +77,10 @@ public ConsentResponse updateConsent(
         @Valid @RequestBody ConsentRequest request) {
 
     return consentService.updateConsent(id, request);
+}
+@DeleteMapping("/{id}")
+@ResponseStatus(HttpStatus.NO_CONTENT)
+public void deleteConsent(@PathVariable Long id) {
+    consentService.deleteConsent(id);
 }
 }
