@@ -19,7 +19,14 @@ public class SecurityConfig {
                                               // architecture, we'll disable CSRF.
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt->{}));   // means now our spring appn is a resource server and requires jwt token to access the endpoints
+                .oauth2ResourceServer(oauth2 ->
+    oauth2.jwt(jwt ->
+        jwt.jwtAuthenticationConverter(
+            new KeycloakJwtAuthenticationConverter()
+        )
+    )
+); // means now our spring appn is a resource
+                                                                             
 
         return http.build();
     }
