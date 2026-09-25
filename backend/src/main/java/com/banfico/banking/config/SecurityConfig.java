@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 public class SecurityConfig {
@@ -18,19 +19,15 @@ public class SecurityConfig {
                                               // than traditional server-side session/form authentication. For this API
                                               // architecture, we'll disable CSRF.
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/accounts")
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 ->
-    oauth2.jwt(jwt ->
-        jwt.jwtAuthenticationConverter(
-            new KeycloakJwtAuthenticationConverter()
-        )
-    )
-); // means now our spring appn is a resource
-                                                                             
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(
+                        new KeycloakJwtAuthenticationConverter()))); // means now our spring appn is a resource
 
         return http.build();
     }
 }
 
-// .anyRequest().authenticated() -> Allow every request (no aunthentication
+// .anyRequest().authenticated() -> DisAllow every request (need aunthentication
 // required)
