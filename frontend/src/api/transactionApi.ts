@@ -18,4 +18,15 @@ export const transactionApi = {
       `/accounts/${accountId}/transactions`
     );
   },
+  create(data: {
+  amount: number;
+  transactionType: string;
+  description: string;
+  bankAccountId: number;
+}): Promise<TransactionResponse> {
+  return apiClient.post<TransactionResponse>(
+    "/transactions",
+    data
+  );
+},
 };

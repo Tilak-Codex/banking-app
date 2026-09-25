@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,8 +13,9 @@ export default function BeneficiariesPage() {
   const params = useParams();
   const customerId = Number(params.id);
 
-  const [beneficiaries, setBeneficiaries] =
-    useState<BeneficiaryResponse[]>([]);
+  const [beneficiaries, setBeneficiaries] = useState<
+    BeneficiaryResponse[]
+  >([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,6 +44,26 @@ export default function BeneficiariesPage() {
     }
   }
 
+  async function handleDelete(beneficiaryId: number) {
+    try {
+      setError("");
+
+      await beneficiaryApi.delete(beneficiaryId);
+
+      setBeneficiaries((previous) =>
+        previous.filter(
+          (beneficiary) => beneficiary.id !== beneficiaryId
+        )
+      );
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete beneficiary"
+      );
+    }
+  }
+
   if (loading) {
     return <p>Loading beneficiaries...</p>;
   }
@@ -50,7 +72,6 @@ export default function BeneficiariesPage() {
     return (
       <main>
         <p>{error}</p>
-
         <button onClick={loadBeneficiaries}>
           Retry
         </button>
@@ -59,6 +80,52 @@ export default function BeneficiariesPage() {
   }
 
   return (
-    <main> <h1>Beneficiaries</h1> <Link href={`/customers/${customerId}`}> Back to Customer </Link> <br /> <br /> <Link href={`/customers/${customerId}/beneficiaries/create`}> Add Beneficiary </Link> {beneficiaries.length === 0 ? ( <p>No beneficiaries found.</p> ) : ( <ul> {beneficiaries.map((beneficiary) => ( <li key={beneficiary.id}> <strong>{beneficiary.name}</strong> <br /> Account Number: {beneficiary.accountNumber} <br /> Bank Code: {beneficiary.bankCode} </li> ))} </ul> )} </main>
+    <main>
+      <h1>Beneficiaries</h1>
+
+      <Link href={`/customers/${customerId}`}>
+        Back to Customer
+      </Link>
+
+      <br />
+      <br />
+
+      <Link
+        href={`/customers/${customerId}/beneficiaries/create`}
+      >
+        Add Beneficiary
+      </Link>
+
+      <br />
+      <br />
+
+      {beneficiaries.length === 0 ? (
+        <p>No beneficiaries found.</p>
+      ) : (
+        <ul>
+          {beneficiaries.map((beneficiary) => (
+            <li key={beneficiary.id}>
+              <strong>{beneficiary.name}</strong>
+              <br />
+
+              Account Number: {beneficiary.accountNumber}
+              <br />
+
+              Bank Code: {beneficiary.bankCode}
+              <br />
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleDelete(beneficiary.id)
+                }
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </main>
   );
 }

@@ -21,7 +21,9 @@ export const beneficiaryApi = {
       `/beneficiaries/customers/${customerId}`
     );
   },
-
+delete(id: number): Promise<void> {
+  return apiClient.delete<void>(`/beneficiaries/${id}`);
+},
   create(
     customerId: number,
     data: BeneficiaryRequest

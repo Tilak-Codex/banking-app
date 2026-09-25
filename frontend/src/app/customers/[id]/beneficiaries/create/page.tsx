@@ -110,7 +110,16 @@ export default function CreateBeneficiaryPage() {
   return (
     <main>
       <h1>Add Beneficiary</h1>
-<Link href={`/customers/${customerId}/beneficiaries`}> Back to Beneficiaries </Link> <br /> <br />
+
+      <Link
+        href={`/customers/${customerId}/beneficiaries`}
+      >
+        Back to Beneficiaries
+      </Link>
+
+      <br />
+      <br />
+
       {error && <p>{error}</p>}
 
       <form onSubmit={handleSubmit}>
@@ -176,10 +185,9 @@ export default function CreateBeneficiaryPage() {
         <br />
 
         <button type="submit" disabled={loading}>
-          {loading
-            ? "Adding..."
-            : "Add Beneficiary"}
+          {loading ? "Adding..." : "Add Beneficiary"}
         </button>
+        
       </form>
     </main>
   );
