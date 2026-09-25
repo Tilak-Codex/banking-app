@@ -41,7 +41,8 @@ public class KeycloakJwtAuthenticationConverter
         var authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
-
+System.out.println("KEYCLOAK ROLES: " + roles);
+System.out.println("SPRING AUTHORITIES: " + authorities);
         return new JwtAuthenticationToken(jwt, authorities);
     }
 }
