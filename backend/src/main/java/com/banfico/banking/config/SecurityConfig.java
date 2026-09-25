@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 
 @Configuration
 public class SecurityConfig {
@@ -18,6 +19,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // application is using a REST API with JWT bearer authentication rather
                                               // than traditional server-side session/form authentication. For this API
                                               // architecture, we'll disable CSRF.
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/accounts")
                         .hasRole("ADMIN")
