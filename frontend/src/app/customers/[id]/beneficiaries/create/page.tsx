@@ -7,6 +7,7 @@ import {
   beneficiaryApi,
   BeneficiaryRequest,
 } from "@/api/beneficiaryApi";
+import Link from "next/link";
 
 export default function CreateBeneficiaryPage() {
   const params = useParams();
@@ -109,7 +110,7 @@ export default function CreateBeneficiaryPage() {
   return (
     <main>
       <h1>Add Beneficiary</h1>
-
+<Link href={`/customers/${customerId}/beneficiaries`}> Back to Beneficiaries </Link> <br /> <br />
       {error && <p>{error}</p>}
 
       <form onSubmit={handleSubmit}>

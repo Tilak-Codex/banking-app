@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { customerApi, CustomerRequest } from "@/api/customerApi";
+import Link from "next/link";
 
 export default function CreateCustomerPage() {
   const router = useRouter();
@@ -81,7 +82,7 @@ export default function CreateCustomerPage() {
   return (
     <main>
       <h1>Create Customer</h1>
-
+      <Link href="/customers"> Back to Customers </Link> <br /> <br />
       {error && <p>{error}</p>}
 
       <form onSubmit={handleSubmit}>
