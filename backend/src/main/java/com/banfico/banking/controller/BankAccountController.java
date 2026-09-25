@@ -52,7 +52,7 @@ public class BankAccountController {
 
         return bankAccountService.getAllBankAccounts();
     }
-
+    
     @PutMapping("/{id}")
     public BankAccountResponse updateBankAccount(
             @PathVariable Long id,
@@ -81,4 +81,9 @@ public class BankAccountController {
 
         return bankAccountService.getCustomersByBankAccountId(accountId);
     }
+    @GetMapping("/{id}")
+public BankAccountResponse getBankAccountById(
+        @PathVariable Long id) {
+    return bankAccountService.getBankAccountById(id);
+}
 }

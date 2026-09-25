@@ -122,7 +122,20 @@ return new BankAccountResponse(
             ))
             .collect(java.util.stream.Collectors.toSet());
 }
+public CustomerResponse getCustomerById(Long id) {
+    Customer customer = customerRepository.findById(id)
+            .orElseThrow(() ->
+                    new CustomerNotFoundException("Customer not found"));
 
+    return toResponse(customer);
+}
+
+public List<CustomerResponse> getAllCustomers() {
+    return customerRepository.findAll()
+            .stream()
+            .map(this::toResponse)
+            .toList();
+}
     private CustomerResponse toResponse(Customer customer) {
 
         return new CustomerResponse(

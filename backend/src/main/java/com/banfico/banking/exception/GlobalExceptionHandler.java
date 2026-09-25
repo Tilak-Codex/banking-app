@@ -89,42 +89,52 @@ private static final Logger log =
         );
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(
-            MethodArgumentNotValidException exception) {
+@ExceptionHandler(MethodArgumentNotValidException.class)
+public ResponseEntity<ErrorResponse> handleValidationErrors(
+        MethodArgumentNotValidException exception) {
 
-        Map<String, String> errors = new HashMap<>();
+    Map<String, String> errors = new HashMap<>();
 
-        exception.getBindingResult()
-                .getFieldErrors()
-                .forEach(error ->
-                        errors.put(
-                                error.getField(),
-                                error.getDefaultMessage()
-                        )
-                );
+    exception.getBindingResult()
+            .getFieldErrors()
+            .forEach(error ->
+                    errors.put(
+                            error.getField(),
+                            error.getDefaultMessage()
+                    )
+            );
 
-        return buildErrorResponse(
-                HttpStatus.BAD_REQUEST,
-                errors.toString()
-        );
-    }
+    ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+            "Validation failed",
+            errors
+    );
 
-    private ResponseEntity<ErrorResponse> buildErrorResponse(
-            HttpStatus status,
-            String message) {
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(errorResponse);
+}
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                status.value(),
-                status.getReasonPhrase(),
-                message
-        );
+private ResponseEntity<ErrorResponse> buildErrorResponse(
+        HttpStatus status,
+        String message) {
 
-        return ResponseEntity
-                .status(status)
-                .body(errorResponse);
-    }
+    ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            status.value(),
+            status.getReasonPhrase(),
+            message
+    );
+
+    return ResponseEntity
+            .status(status)
+            .body(errorResponse);
+}
+
+
+
     @ExceptionHandler(Exception.class)
 public ResponseEntity<ErrorResponse> handleUnexpectedException(
         Exception exception) {

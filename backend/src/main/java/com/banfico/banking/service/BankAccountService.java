@@ -18,102 +18,103 @@ import com.banfico.banking.exception.DuplicateResourceException;
 @Service
 public class BankAccountService {
 
-    private final BankAccountRepository bankAccountRepository;
+        private final BankAccountRepository bankAccountRepository;
 
-    public BankAccountService(BankAccountRepository bankAccountRepository) {
-        this.bankAccountRepository = bankAccountRepository;
-    }
+        public BankAccountService(BankAccountRepository bankAccountRepository) {
+                this.bankAccountRepository = bankAccountRepository;
+        }
 
-    public BankAccountResponse createBankAccount(
-        BankAccountRequest request) {
+        public BankAccountResponse createBankAccount(
+                        BankAccountRequest request) {
 
-    if (bankAccountRepository.existsByAccountNumber(
-            request.getAccountNumber())) {
+                if (bankAccountRepository.existsByAccountNumber(
+                                request.getAccountNumber())) {
 
-        throw new DuplicateResourceException(
-                "Bank account with this account number already exists");
-    }
+                        throw new DuplicateResourceException(
+                                        "Bank account with this account number already exists");
+                }
 
-    BankAccount bankAccount = new BankAccount();
+                BankAccount bankAccount = new BankAccount();
 
-    bankAccount.setAccountNumber(request.getAccountNumber());
-    bankAccount.setBalance(request.getBalance());
-    bankAccount.setAccountType(request.getAccountType());
+                bankAccount.setAccountNumber(request.getAccountNumber());
+                bankAccount.setBalance(request.getBalance());
+                bankAccount.setAccountType(request.getAccountType());
 
-    BankAccount savedAccount =
-            bankAccountRepository.save(bankAccount);
+                BankAccount savedAccount = bankAccountRepository.save(bankAccount);
 
-    return toResponse(savedAccount);
-}
+                return toResponse(savedAccount);
+        }
 
-    public List<BankAccountResponse> getAllBankAccounts() {
+        public List<BankAccountResponse> getAllBankAccounts() {
 
-        return bankAccountRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
+                return bankAccountRepository.findAll()
+                                .stream()
+                                .map(this::toResponse)
+                                .toList();
+        }
 
-   public BankAccountResponse updateBankAccount(
-        Long id,
-        BankAccountUpdateRequest request) {
+        public BankAccountResponse getBankAccountById(Long id) {
+                BankAccount bankAccount = bankAccountRepository.findById(id)
+                                .orElseThrow(() -> new BankAccountNotFoundException(
+                                                "Bank account not found"));
 
-    BankAccount bankAccount = bankAccountRepository.findById(id)
-            .orElseThrow(() ->
-                    new BankAccountNotFoundException(
-                            "Bank account not found"));
+                return toResponse(bankAccount);
+        }
 
-    if (bankAccountRepository.existsByAccountNumberAndIdNot(
-            request.getAccountNumber(), id)) {
+        public BankAccountResponse updateBankAccount(
+                        Long id,
+                        BankAccountUpdateRequest request) {
 
-        throw new DuplicateResourceException(
-                "Bank account with this account number already exists");
-    }
+                BankAccount bankAccount = bankAccountRepository.findById(id)
+                                .orElseThrow(() -> new BankAccountNotFoundException(
+                                                "Bank account not found"));
 
-    bankAccount.setAccountNumber(request.getAccountNumber());
-    bankAccount.setAccountType(request.getAccountType());
+                if (bankAccountRepository.existsByAccountNumberAndIdNot(
+                                request.getAccountNumber(), id)) {
 
-    BankAccount updatedAccount =
-            bankAccountRepository.save(bankAccount);
+                        throw new DuplicateResourceException(
+                                        "Bank account with this account number already exists");
+                }
 
-    return toResponse(updatedAccount);
-}
+                bankAccount.setAccountNumber(request.getAccountNumber());
+                bankAccount.setAccountType(request.getAccountType());
 
-    public void deleteBankAccount(Long id) {
+                BankAccount updatedAccount = bankAccountRepository.save(bankAccount);
 
-        BankAccount bankAccount = bankAccountRepository.findById(id)
-                .orElseThrow(() ->
-                        new BankAccountNotFoundException("Bank account not found"));
+                return toResponse(updatedAccount);
+        }
 
-        bankAccountRepository.delete(bankAccount);
-    }
+        public void deleteBankAccount(Long id) {
 
-    public Set<CustomerResponse> getCustomersByBankAccountId(
-        Long accountId) {
+                BankAccount bankAccount = bankAccountRepository.findById(id)
+                                .orElseThrow(() -> new BankAccountNotFoundException("Bank account not found"));
 
-    BankAccount bankAccount = bankAccountRepository.findById(accountId)
-            .orElseThrow(() ->
-                    new BankAccountNotFoundException(
-                            "Bank account not found"));
+                bankAccountRepository.delete(bankAccount);
+        }
 
-    return bankAccount.getCustomers()
-            .stream()
-            .map(customer -> new CustomerResponse(
-                    customer.getId(),
-                    customer.getName(),
-                    customer.getEmail(),
-                    customer.getPhoneNumber()
-            ))
-            .collect(java.util.stream.Collectors.toSet());
-}
+        public Set<CustomerResponse> getCustomersByBankAccountId(
+                        Long accountId) {
 
-    private BankAccountResponse toResponse(BankAccount bankAccount) {
+                BankAccount bankAccount = bankAccountRepository.findById(accountId)
+                                .orElseThrow(() -> new BankAccountNotFoundException(
+                                                "Bank account not found"));
 
-        return new BankAccountResponse(
-                bankAccount.getId(),
-                bankAccount.getAccountNumber(),
-                bankAccount.getBalance(),
-                bankAccount.getAccountType()
-        );
-    }
+                return bankAccount.getCustomers()
+                                .stream()
+                                .map(customer -> new CustomerResponse(
+                                                customer.getId(),
+                                                customer.getName(),
+                                                customer.getEmail(),
+                                                customer.getPhoneNumber()))
+                                .collect(java.util.stream.Collectors.toSet());
+        }
+
+        private BankAccountResponse toResponse(BankAccount bankAccount) {
+
+                return new BankAccountResponse(
+                                bankAccount.getId(),
+                                bankAccount.getAccountNumber(),
+                                bankAccount.getBalance(),
+                                bankAccount.getAccountType());
+        }
 }
