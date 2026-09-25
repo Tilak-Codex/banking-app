@@ -23,9 +23,10 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/transactions")
                         .hasRole("MAKER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/beneficiaries/{id}")
+                        .hasAnyRole("ADMIN", "CHECKER")
                         .anyRequest().authenticated())
-                .requestMatchers(HttpMethod.DELETE, "/api/beneficiaries/{id}")
-                .hasAnyRole("ADMIN", "CHECKER")
+
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(
                         new KeycloakJwtAuthenticationConverter()))); // means now our spring appn is a resource
 
