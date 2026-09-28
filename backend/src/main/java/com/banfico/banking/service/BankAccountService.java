@@ -14,6 +14,8 @@ import com.banfico.banking.repository.BankAccountRepository;
 import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.dto.BankAccountUpdateRequest;
 import com.banfico.banking.exception.DuplicateResourceException;
+import com.banfico.banking.spec.BankAccountSpecification;
+import org.springframework.data.jpa.domain.Specification;
 
 @Service
 public class BankAccountService {
@@ -116,5 +118,9 @@ public class BankAccountService {
                                 bankAccount.getAccountNumber(),
                                 bankAccount.getBalance(),
                                 bankAccount.getAccountType());
+        }
+        public List<BankAccount> searchAccount(String accountNumber){
+                Specification<BankAccount>spec=Specification.where(BankAccountSpecification.hasAccount(accountNumber));
+                return bankAccountRepository.findAll(spec);
         }
 }

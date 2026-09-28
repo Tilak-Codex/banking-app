@@ -22,183 +22,176 @@ import com.banfico.banking.exception.DuplicateResourceException;
 @Service
 public class CustomerService {
 
-    private final CustomerRepository customerRepository;
-    private final BankAccountRepository bankAccountRepository;
+        private final CustomerRepository customerRepository;
+        private final BankAccountRepository bankAccountRepository;
 
-    public CustomerService(
-            CustomerRepository customerRepository,
-            BankAccountRepository bankAccountRepository) {
+        public CustomerService(
+                        CustomerRepository customerRepository,
+                        BankAccountRepository bankAccountRepository) {
 
-        this.customerRepository = customerRepository;
-        this.bankAccountRepository = bankAccountRepository;
-    }
+                this.customerRepository = customerRepository;
+                this.bankAccountRepository = bankAccountRepository;
+        }
 
-    public CustomerResponse createCustomer(CustomerRequest request) {
+        public CustomerResponse createCustomer(CustomerRequest request) {
 
-    if (customerRepository.existsByEmail(request.getEmail())) {
-        throw new DuplicateResourceException(
-                "Customer with this email already exists");
-    }
+                if (customerRepository.existsByEmail(request.getEmail())) {
+                        throw new DuplicateResourceException(
+                                        "Customer with this email already exists");
+                }
 
-    if (customerRepository.existsByPhoneNumber(
-            request.getPhoneNumber())) {
+                if (customerRepository.existsByPhoneNumber(
+                                request.getPhoneNumber())) {
 
-        throw new DuplicateResourceException(
-                "Customer with this phone number already exists");
-    }
+                        throw new DuplicateResourceException(
+                                        "Customer with this phone number already exists");
+                }
 
-    Customer customer = new Customer();
+                Customer customer = new Customer();
 
-    customer.setName(request.getName());
-    customer.setEmail(request.getEmail());
-    customer.setPhoneNumber(request.getPhoneNumber());
+                customer.setName(request.getName());
+                customer.setEmail(request.getEmail());
+                customer.setPhoneNumber(request.getPhoneNumber());
 
-    Customer savedCustomer = customerRepository.save(customer);
+                Customer savedCustomer = customerRepository.save(customer);
 
-    return toResponse(savedCustomer);
-}
+                return toResponse(savedCustomer);
+        }
 
-    public BankAccountResponse addBankAccountToCustomer(
-        Long customerId,
-        Long accountId) {
+        public BankAccountResponse addBankAccountToCustomer(
+                        Long customerId,
+                        Long accountId) {
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
+                Customer customer = customerRepository.findById(customerId)
+                                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-        BankAccount bankAccount = bankAccountRepository.findById(accountId)
-                .orElseThrow(() ->
-                        new BankAccountNotFoundException("Bank account not found"));
+                BankAccount bankAccount = bankAccountRepository.findById(accountId)
+                                .orElseThrow(() -> new BankAccountNotFoundException("Bank account not found"));
 
-        customer.getBankAccounts().add(bankAccount);
+                customer.getBankAccounts().add(bankAccount);
 
-        customerRepository.save(customer);
+                customerRepository.save(customer);
 
-return new BankAccountResponse(
-        bankAccount.getId(),
-        bankAccount.getAccountNumber(),
-        bankAccount.getBalance(),
-        bankAccount.getAccountType()
-);
-    }
+                return new BankAccountResponse(
+                                bankAccount.getId(),
+                                bankAccount.getAccountNumber(),
+                                bankAccount.getBalance(),
+                                bankAccount.getAccountType());
+        }
 
-    public BankAccountResponse removeBankAccountFromCustomer(
-        Long customerId,
-        Long accountId) {
+        public BankAccountResponse removeBankAccountFromCustomer(
+                        Long customerId,
+                        Long accountId) {
 
-    Customer customer = customerRepository.findById(customerId)
-            .orElseThrow(() ->
-                    new CustomerNotFoundException("Customer not found"));
+                Customer customer = customerRepository.findById(customerId)
+                                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-    BankAccount bankAccount = bankAccountRepository.findById(accountId)
-            .orElseThrow(() ->
-                    new BankAccountNotFoundException("Bank account not found"));
+                BankAccount bankAccount = bankAccountRepository.findById(accountId)
+                                .orElseThrow(() -> new BankAccountNotFoundException("Bank account not found"));
 
-    customer.getBankAccounts().remove(bankAccount);
+                customer.getBankAccounts().remove(bankAccount);
 
-    customerRepository.save(customer);
+                customerRepository.save(customer);
 
-    return new BankAccountResponse(
-            bankAccount.getId(),
-            bankAccount.getAccountNumber(),
-            bankAccount.getBalance(),
-            bankAccount.getAccountType()
-    );
-}
-    public Set<BankAccountResponse> getBankAccountsByCustomerId(
-        Long customerId) {
+                return new BankAccountResponse(
+                                bankAccount.getId(),
+                                bankAccount.getAccountNumber(),
+                                bankAccount.getBalance(),
+                                bankAccount.getAccountType());
+        }
 
-    Customer customer = customerRepository.findById(customerId)
-            .orElseThrow(() ->
-                    new CustomerNotFoundException("Customer not found"));
+        public Set<BankAccountResponse> getBankAccountsByCustomerId(
+                        Long customerId) {
 
-    return customer.getBankAccounts()
-            .stream()
-            .map(account -> new BankAccountResponse(
-                    account.getId(),
-                    account.getAccountNumber(),
-                    account.getBalance(),
-                    account.getAccountType()
-            ))
-            .collect(java.util.stream.Collectors.toSet());
-}
-public CustomerResponse getCustomerById(Long id) {
-    Customer customer = customerRepository.findById(id)
-            .orElseThrow(() ->
-                    new CustomerNotFoundException("Customer not found"));
+                Customer customer = customerRepository.findById(customerId)
+                                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-    return toResponse(customer);
-}
+                return customer.getBankAccounts()
+                                .stream()
+                                .map(account -> new BankAccountResponse(
+                                                account.getId(),
+                                                account.getAccountNumber(),
+                                                account.getBalance(),
+                                                account.getAccountType()))
+                                .collect(java.util.stream.Collectors.toSet());
+        }
 
-public List<CustomerResponse> getAllCustomers() {
-    return customerRepository.findAll()
-            .stream()
-            .map(this::toResponse)
-            .toList();
-}
-    private CustomerResponse toResponse(Customer customer) {
+        public CustomerResponse getCustomerById(Long id) {
+                Customer customer = customerRepository.findById(id)
+                                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-        return new CustomerResponse(
-                customer.getId(),
-                customer.getName(),
-                customer.getEmail(),
-                customer.getPhoneNumber()
-        );
-    }
-    public CustomerResponse updateCustomer(
-        Long id,
-        CustomerRequest request) {
+                return toResponse(customer);
+        }
 
-    Customer customer = customerRepository.findById(id)
-            .orElseThrow(() ->
-                    new CustomerNotFoundException("Customer not found"));
+        public List<CustomerResponse> getAllCustomers() {
+                return customerRepository.findAll()
+                                .stream()
+                                .map(this::toResponse)
+                                .toList();
+        }
 
-    if (customerRepository.existsByEmailAndIdNot(
-            request.getEmail(), id)) {
+        private CustomerResponse toResponse(Customer customer) {
 
-        throw new DuplicateResourceException(
-                "Customer with this email already exists");
-    }
+                return new CustomerResponse(
+                                customer.getId(),
+                                customer.getName(),
+                                customer.getEmail(),
+                                customer.getPhoneNumber());
+        }
 
-    if (customerRepository.existsByPhoneNumberAndIdNot(
-            request.getPhoneNumber(), id)) {
+        public CustomerResponse updateCustomer(
+                        Long id,
+                        CustomerRequest request) {
 
-        throw new DuplicateResourceException(
-                "Customer with this phone number already exists");
-    }
+                Customer customer = customerRepository.findById(id)
+                                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
 
-    customer.setName(request.getName());
-    customer.setEmail(request.getEmail());
-    customer.setPhoneNumber(request.getPhoneNumber());
+                if (customerRepository.existsByEmailAndIdNot(
+                                request.getEmail(), id)) {
 
-    Customer updatedCustomer =
-            customerRepository.save(customer);
+                        throw new DuplicateResourceException(
+                                        "Customer with this email already exists");
+                }
 
-    return toResponse(updatedCustomer);
-}
-    @Transactional
-public void deleteCustomer(Long id) {
+                if (customerRepository.existsByPhoneNumberAndIdNot(
+                                request.getPhoneNumber(), id)) {
 
-    Customer customer = customerRepository.findById(id)
-            .orElseThrow(() ->
-                    new CustomerNotFoundException(
-                            "Customer not found"));
+                        throw new DuplicateResourceException(
+                                        "Customer with this phone number already exists");
+                }
 
-    if (!customer.getBankAccounts().isEmpty()) {
-        throw new IllegalArgumentException(
-                "Customer cannot be deleted because bank accounts are linked");
-    }
+                customer.setName(request.getName());
+                customer.setEmail(request.getEmail());
+                customer.setPhoneNumber(request.getPhoneNumber());
 
-    if (!customer.getBeneficiaries().isEmpty()) {
-        throw new IllegalArgumentException(
-                "Customer cannot be deleted because beneficiaries exist");
-    }
+                Customer updatedCustomer = customerRepository.save(customer);
 
-    if (!customer.getConsents().isEmpty()) {
-        throw new IllegalArgumentException(
-                "Customer cannot be deleted because consents exist");
-    }
+                return toResponse(updatedCustomer);
+        }
 
-    customerRepository.delete(customer);
-}
+        @Transactional
+        public void deleteCustomer(Long id) {
+
+                Customer customer = customerRepository.findById(id)
+                                .orElseThrow(() -> new CustomerNotFoundException(
+                                                "Customer not found"));
+
+                if (!customer.getBankAccounts().isEmpty()) {
+                        throw new IllegalArgumentException(
+                                        "Customer cannot be deleted because bank accounts are linked");
+                }
+
+                if (!customer.getBeneficiaries().isEmpty()) {
+                        throw new IllegalArgumentException(
+                                        "Customer cannot be deleted because beneficiaries exist");
+                }
+
+                if (!customer.getConsents().isEmpty()) {
+                        throw new IllegalArgumentException(
+                                        "Customer cannot be deleted because consents exist");
+                }
+
+                customerRepository.delete(customer);
+        }
+
 }

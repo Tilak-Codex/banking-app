@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import com.banfico.banking.dto.BankAccountRequest;
 import com.banfico.banking.dto.BankAccountResponse;
 import com.banfico.banking.dto.BankAccountUpdateRequest;
@@ -21,7 +21,7 @@ import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.dto.TransactionResponse;
 import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
-
+import com.banfico.banking.entity.BankAccount;
 import jakarta.validation.Valid;
 
 @RestController
@@ -86,4 +86,8 @@ public BankAccountResponse getBankAccountById(
         @PathVariable Long id) {
     return bankAccountService.getBankAccountById(id);
 }
+@GetMapping("/search")
+public List<BankAccount> searchAccount(@RequestParam String accountNumber){
+        return bankAccountService.searchAccount(accountNumber);
+    }
 }
