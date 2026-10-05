@@ -25,35 +25,42 @@ public class Customer {
     @JsonManagedReference
     private Set<Beneficiary> beneficiaries = new HashSet<>();
     @OneToMany(mappedBy = "customer")
-private Set<Consent> consents = new HashSet<>();
+    private Set<Consent> consents = new HashSet<>();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "Name is required")
-@Column(nullable = false)
-private String name;
+    @Column(nullable = false)
+    private String name;
 
-@NotBlank(message = "Email is required")
-@Email(message = "Invalid email format")
-@Column(nullable = false, unique = true)
-private String email;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    @Column(nullable = false, unique = true)
+    private String email;
 
-@NotBlank(message = "Phone number is required")
-@Pattern(
-    regexp = "^[0-9]{10}$",
-    message = "Phone number must contain exactly 10 digits"
-)
-@Column(nullable = false, unique = true)
-private String phoneNumber;
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must contain exactly 10 digits")
+    @Column(nullable = false, unique = true)
+    private String phoneNumber;
     @ManyToMany
     @JoinTable(name = "customer_bank_accounts", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "bank_account_id"))
     private Set<BankAccount> bankAccounts = new HashSet<>();
 
+    @Column(name="key_cloak_user_id",unique=true)
+    private String keycloakUserId;
     
-
     public Long getId() {
         return id;
+    }
+
+    public String getKeycloakUserId() {
+        return keycloakUserId;
+    }
+
+    public void setKeycloakUserId(String keycloakUserId) {
+        this.keycloakUserId = keycloakUserId;
     }
 
     public void setId(Long id) {
@@ -99,11 +106,12 @@ private String phoneNumber;
     public void setBeneficiaries(Set<Beneficiary> beneficiaries) {
         this.beneficiaries = beneficiaries;
     }
-public Set<Consent> getConsents() {
-    return consents;
-}
 
-public void setConsents(Set<Consent> consents) {
-    this.consents = consents;
-}
+    public Set<Consent> getConsents() {
+        return consents;
+    }
+
+    public void setConsents(Set<Consent> consents) {
+        this.consents = consents;
+    }
 }

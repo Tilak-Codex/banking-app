@@ -18,6 +18,10 @@ export const customerApi = {
     return apiClient.get<CustomerResponse[]>("/customers");
   },
 
+  getMe(): Promise<CustomerResponse> {
+    return apiClient.get<CustomerResponse>("/customers/me");
+  },
+
   getById(id: number): Promise<CustomerResponse> {
     return apiClient.get<CustomerResponse>(`/customers/${id}`);
   },

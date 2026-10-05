@@ -50,7 +50,16 @@ private LocalDateTime transactionDate;
     @JoinColumn(name = "bank_account_id", nullable = false)
     @JsonBackReference
     private BankAccount bankAccount;
+public BigDecimal getBalanceAfter() {
+        return balanceAfter;
+    }
 
+    public void setBalanceAfter(BigDecimal balanceAfter) {
+        this.balanceAfter = balanceAfter;
+    }
+
+@Column(nullable = false)
+private BigDecimal balanceAfter;
     public Long getId() {
         return id;
     }

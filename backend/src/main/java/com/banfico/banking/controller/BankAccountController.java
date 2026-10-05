@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,9 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+
 import com.banfico.banking.dto.BankAccountRequest;
 import com.banfico.banking.dto.BankAccountResponse;
 import com.banfico.banking.dto.BankAccountUpdateRequest;
@@ -21,7 +25,7 @@ import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.dto.TransactionResponse;
 import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
-import com.banfico.banking.entity.BankAccount;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -52,7 +56,7 @@ public class BankAccountController {
 
         return bankAccountService.getAllBankAccounts();
     }
-    
+
     @PutMapping("/{id}")
     public BankAccountResponse updateBankAccount(
             @PathVariable Long id,
@@ -81,13 +85,38 @@ public class BankAccountController {
 
         return bankAccountService.getCustomersByBankAccountId(accountId);
     }
+
     @GetMapping("/{id}")
-public BankAccountResponse getBankAccountById(
-        @PathVariable Long id) {
-    return bankAccountService.getBankAccountById(id);
-}
-@GetMapping("/search")
-public List<BankAccount> searchAccount(@RequestParam String accountNumber){
-        return bankAccountService.searchAccount(accountNumber);
+    public BankAccountResponse getBankAccountById(
+            @PathVariable Long id) {
+
+        return bankAccountService.getBankAccountById(id);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<BankAccountResponse>> searchAccounts(
+            @RequestParam String accountNumber) {
+
+        List<BankAccountResponse> accounts =
+                bankAccountService.searchAccount(accountNumber);
+
+        return ResponseEntity.ok(accounts);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<BankAccountResponse>> getMyAccounts(
+            @AuthenticationPrincipal Jwt jwt) {
+
+        return ResponseEntity.ok(
+                bankAccountService.getMyAccounts(jwt));
+    }
+
+    @GetMapping("/me/{id}")
+    public ResponseEntity<BankAccountResponse> getMyBankAccountById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        return ResponseEntity.ok(
+                bankAccountService.getMyBankAccountById(id, jwt));
     }
 }

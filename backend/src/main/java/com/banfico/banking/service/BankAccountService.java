@@ -16,6 +16,7 @@ import com.banfico.banking.dto.BankAccountUpdateRequest;
 import com.banfico.banking.exception.DuplicateResourceException;
 import com.banfico.banking.spec.BankAccountSpecification;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 @Service
 public class BankAccountService {
@@ -119,8 +120,45 @@ public class BankAccountService {
                                 bankAccount.getBalance(),
                                 bankAccount.getAccountType());
         }
-        public List<BankAccount> searchAccount(String accountNumber){
-                Specification<BankAccount>spec=Specification.where(BankAccountSpecification.hasAccount(accountNumber));
-                return bankAccountRepository.findAll(spec);
-        }
+        public List<BankAccountResponse> searchAccount(String accountNumber) {
+    Specification<BankAccount> spec =
+            BankAccountSpecification.hasAccount(accountNumber);
+
+    return bankAccountRepository.findAll(spec)
+            .stream()
+            .map(this::toResponse)
+            .toList();
+}
+public List<BankAccountResponse> getMyAccounts(Jwt jwt) {
+
+    String keycloakUserId = jwt.getSubject();
+
+    List<BankAccount> accounts =
+            bankAccountRepository.findByCustomers_KeycloakUserId(
+                    keycloakUserId
+            );
+
+    return accounts.stream()
+            .map(this::toResponse)
+            .toList();
+}
+public BankAccountResponse getMyBankAccountById(
+        Long id,
+        Jwt jwt) {
+
+    String keycloakUserId = jwt.getSubject();
+System.out.println("JWT subject: " + jwt.getSubject());
+    BankAccount bankAccount =
+            bankAccountRepository
+                    .findByIdAndCustomers_KeycloakUserId(
+                            id,
+                            keycloakUserId
+                    )
+                    .orElseThrow(() ->
+                            new BankAccountNotFoundException(
+                                    "Bank account not found"
+                            ));
+
+    return toResponse(bankAccount);
+}
 }

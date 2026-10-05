@@ -1,35 +1,52 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import Link from "next/link";
+
 import { useParams } from "next/navigation";
-import { customerApi, CustomerResponse } from "@/api/customerApi";
+
+import {
+  customerApi,
+  CustomerResponse,
+} from "@/api/customerApi";
+
+import keycloak from "@/auth/keycloak";
 
 export default function CustomerDetailsPage() {
   const params = useParams();
 
   const id = Number(params.id);
 
-  const [customer, setCustomer] = useState<CustomerResponse | null>(null);
+  const [customer, setCustomer] =
+    useState<CustomerResponse | null>(null);
 
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
+
+  const isClient =
+    keycloak.realmAccess?.roles.includes("CLIENT") ?? false;
 
   useEffect(() => {
     loadCustomer();
-  }, []);
+  }, [id]);
 
   async function loadCustomer() {
     try {
       setLoading(true);
       setError("");
 
-      const data = await customerApi.getById(id);
+      const data = isClient
+        ? await customerApi.getMe()
+        : await customerApi.getById(id);
 
       setCustomer(data);
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : "Failed to load customer",
+        error instanceof Error
+          ? error.message
+          : "Failed to load customer"
       );
     } finally {
       setLoading(false);
@@ -45,7 +62,9 @@ export default function CustomerDetailsPage() {
       <main>
         <p>{error}</p>
 
-        <button onClick={loadCustomer}>Retry</button>
+        <button onClick={loadCustomer}>
+          Retry
+        </button>
       </main>
     );
   }
@@ -77,7 +96,10 @@ export default function CustomerDetailsPage() {
       </p>
 
       <br />
-      <Link href={`/customers/${customer.id}/beneficiaries`}>
+
+      <Link
+        href={`/customers/${customer.id}/beneficiaries`}
+      >
         View Beneficiaries
       </Link>
     </main>

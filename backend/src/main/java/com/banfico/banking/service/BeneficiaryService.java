@@ -12,6 +12,7 @@ import com.banfico.banking.exception.BeneficiaryNotFoundException;
 import com.banfico.banking.exception.CustomerNotFoundException;
 import com.banfico.banking.repository.BeneficiaryRepository;
 import com.banfico.banking.repository.CustomerRepository;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 @Service
 public class BeneficiaryService {
@@ -114,4 +115,17 @@ public class BeneficiaryService {
                 beneficiary.getBankCode()
         );
     }
+    public List<BeneficiaryResponse> getMyBeneficiaries(Jwt jwt) {
+
+    String keycloakUserId = jwt.getSubject();
+
+    List<Beneficiary> beneficiaries =
+            beneficiaryRepository.findByCustomer_KeycloakUserId(
+                    keycloakUserId
+            );
+
+    return beneficiaries.stream()
+            .map(this::toResponse)
+            .toList();
+}
 }

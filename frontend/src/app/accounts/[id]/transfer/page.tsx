@@ -1,33 +1,24 @@
 
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
-
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-
+import { FormEvent, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { transactionApi } from "@/api/transactionApi";
 
-export default function CreateTransactionPage() {
+export default function TransferPage() {
   const params = useParams();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const accountId = Number(params.id);
 
+  const [destinationAccountNumber, setDestinationAccountNumber] =
+    useState("");
+
   const [amount, setAmount] = useState("");
-  const [transactionType, setTransactionType] = useState("DEPOSIT");
   const [description, setDescription] = useState("");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const type = searchParams.get("type");
-
-    if (type === "DEPOSIT" || type === "WITHDRAWAL") {
-      setTransactionType(type);
-    }
-  }, [searchParams]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -36,41 +27,51 @@ export default function CreateTransactionPage() {
     setLoading(true);
 
     try {
-      await transactionApi.create({
+      await transactionApi.transfer({
+        sourceAccountId: accountId,
+        destinationAccountNumber,
         amount: Number(amount),
-        transactionType,
         description,
-        bankAccountId: accountId,
       });
 
       router.push(`/accounts/${accountId}`);
     } catch (error) {
-      const apiError = error as Error & {
-        status?: number;
-      };
-
       setError(
-        apiError.message || "Failed to create transaction."
+        error instanceof Error
+          ? error.message
+          : "Failed to transfer money."
       );
     } finally {
       setLoading(false);
     }
   }
 
-  const transactionTitle =
-    transactionType === "DEPOSIT"
-      ? "Deposit Money"
-      : "Withdraw Money";
-
   return (
     <main>
-      <h1>{transactionTitle}</h1>
+      <h1>Transfer Money</h1>
 
-      <p>Account ID: {accountId}</p>
-
-      {error && <p>{error}</p>}
+      <p>
+        Source Account ID: <strong>{accountId}</strong>
+      </p>
 
       <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="destinationAccountNumber">
+            Destination Account Number
+          </label>
+
+          <input
+            id="destinationAccountNumber"
+            type="text"
+            value={destinationAccountNumber}
+            onChange={(event) =>
+              setDestinationAccountNumber(event.target.value)
+            }
+            placeholder="Enter account number"
+            required
+          />
+        </div>
+
         <div>
           <label htmlFor="amount">
             Amount
@@ -79,13 +80,13 @@ export default function CreateTransactionPage() {
           <input
             id="amount"
             type="number"
-            step="0.01"
-            min="0.01"
             value={amount}
             onChange={(event) =>
               setAmount(event.target.value)
             }
             required
+            min="0.01"
+            step="0.01"
           />
         </div>
 
@@ -96,21 +97,21 @@ export default function CreateTransactionPage() {
 
           <input
             id="description"
+            type="text"
             value={description}
             onChange={(event) =>
               setDescription(event.target.value)
             }
-            required
           />
         </div>
+
+        {error && <p>{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
         >
-          {loading
-            ? "Processing..."
-            : transactionTitle}
+          {loading ? "Transferring..." : "Transfer Money"}
         </button>
       </form>
 
@@ -120,8 +121,9 @@ export default function CreateTransactionPage() {
           router.push(`/accounts/${accountId}`)
         }
       >
-        Back to Account
+        Cancel
       </button>
     </main>
   );
 }
+

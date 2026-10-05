@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import com.banfico.banking.dto.BeneficiaryRequest;
 import com.banfico.banking.dto.BeneficiaryResponse;
@@ -72,4 +75,12 @@ public class BeneficiaryController {
 
         beneficiaryService.deleteBeneficiary(id);
     }
+    @GetMapping("/me")
+public ResponseEntity<List<BeneficiaryResponse>> getMyBeneficiaries(
+        @AuthenticationPrincipal Jwt jwt) {
+
+    return ResponseEntity.ok(
+            beneficiaryService.getMyBeneficiaries(jwt)
+    );
+}
 }

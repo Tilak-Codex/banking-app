@@ -10,7 +10,7 @@ public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
+        return new WebMvcConfigurer() {   // created a anonymous class
 
             @Override
             public void addCorsMappings(CorsRegistry registry) {
@@ -23,7 +23,7 @@ public class CorsConfig {
                                 "DELETE",
                                 "OPTIONS"
                         )
-                        .allowedHeaders("*");
+                        .allowedHeaders("*");   // headers will have authentication & content-type.. This means any authentication and content type is allowed
             }
         };
     }

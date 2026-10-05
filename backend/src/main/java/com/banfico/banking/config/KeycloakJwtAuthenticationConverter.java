@@ -19,14 +19,17 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class KeycloakJwtAuthenticationConverter
-        implements Converter<Jwt, AbstractAuthenticationToken> {
-
+        implements Converter<Jwt, AbstractAuthenticationToken> {   // Jwt-> input, AbstractAuthenticationToken-> output
+   
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
 
-        Map<String, Object> realmAccess =
-                jwt.getClaim("realm_access");
 
+        /* Claims are piece of info stored in JWT Eg: sub,preferred_username,role_acess are claims */
+        Map<String, Object> realmAccess =
+                jwt.getClaim("realm_access");  // realm_access is a claim in JWT which has the role information
+
+                // If the realmAccess is null, it means user hass no role assigned and nullPointerException occurs
         if (realmAccess == null) {
             return new JwtAuthenticationToken(
                     jwt,
@@ -36,7 +39,7 @@ public class KeycloakJwtAuthenticationConverter
 
         @SuppressWarnings("unchecked")
         Collection<String> roles =
-                (Collection<String>) realmAccess.get("roles");
+                (Collection<String>) realmAccess.get("roles");  // retirves role key
 
         var authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))

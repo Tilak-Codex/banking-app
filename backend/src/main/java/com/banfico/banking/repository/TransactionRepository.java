@@ -11,4 +11,8 @@ public interface TransactionRepository
 
     List<Transaction> findByBankAccountIdOrderByTransactionDateDesc(
             Long bankAccountId);
+            List<Transaction> findByBankAccount_IdAndBankAccount_Customers_KeycloakUserId(
+        Long accountId,
+        String keycloakUserId
+);
 }

@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.banfico.banking.entity.Customer;
 
+import java.util.Optional;
+
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     boolean existsByEmail(String email);
@@ -13,4 +15,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     boolean existsByEmailAndIdNot(String email, Long id);
 
     boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long id);
+
+    Optional<Customer> findByKeycloakUserId(String keycloakUserId);
+
+    boolean existsByKeycloakUserId(String keycloakUserId);
+
+    Optional<Customer> findByIdAndKeycloakUserId(
+            Long id,
+            String keycloakUserId);
 }

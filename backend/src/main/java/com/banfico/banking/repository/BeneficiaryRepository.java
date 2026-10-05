@@ -9,4 +9,8 @@ import com.banfico.banking.entity.Beneficiary;
 public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Long> {
 
     List<Beneficiary> findByCustomerId(Long customerId);
+
+    List<Beneficiary> findByCustomer_KeycloakUserId(
+        String keycloakUserId
+);
 }

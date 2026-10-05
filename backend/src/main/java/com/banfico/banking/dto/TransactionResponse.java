@@ -9,6 +9,7 @@ public class TransactionResponse {
 
     private Long id;
     private BigDecimal amount;
+    private BigDecimal balanceAfter;
     private TransactionType transactionType;
     private String description;
     private LocalDateTime transactionDate;
@@ -25,7 +26,8 @@ public class TransactionResponse {
             String description,
             LocalDateTime transactionDate,
             boolean reversed,
-            Long bankAccountId) {
+            Long bankAccountId,
+            BigDecimal balanceAfter) {
 
         this.id = id;
         this.amount = amount;
