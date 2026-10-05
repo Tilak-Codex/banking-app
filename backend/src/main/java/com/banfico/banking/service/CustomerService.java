@@ -19,6 +19,9 @@ import com.banfico.banking.exception.CustomerNotFoundException;
 import com.banfico.banking.exception.DuplicateResourceException;
 import com.banfico.banking.repository.BankAccountRepository;
 import com.banfico.banking.repository.CustomerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Map;
 import jakarta.transaction.Transactional;
 
@@ -176,14 +179,10 @@ public class CustomerService {
     return toResponse(customer);
 }
 
-    public List<CustomerResponse> getAllCustomers(Pageable pageable) {
-
-        return customerRepository.findAll(pageable)
-                .getContent()
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
+   public Page<CustomerResponse> getAllCustomers(Pageable pageable) {
+    return customerRepository.findAll(pageable)
+            .map(this::toResponse);
+}
 
     private CustomerResponse toResponse(Customer customer) {
 

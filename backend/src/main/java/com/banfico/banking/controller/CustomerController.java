@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.banfico.banking.dto.BankAccountResponse;
 import com.banfico.banking.dto.CustomerRequest;
@@ -31,110 +33,109 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/customers")
 public class CustomerController {
 
-    private final CustomerService customerService;
+        private final CustomerService customerService;
 
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
-    }
+        public CustomerController(CustomerService customerService) {
+                this.customerService = customerService;
+        }
 
-    @PostMapping("/{customerId}/accounts/{accountId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public BankAccountResponse addBankAccountToCustomer(
-            @PathVariable Long customerId,
-            @PathVariable Long accountId,
-            @AuthenticationPrincipal Jwt jwt) {
+        @PostMapping("/{customerId}/accounts/{accountId}")
+        @ResponseStatus(HttpStatus.CREATED)
+        public BankAccountResponse addBankAccountToCustomer(
+                        @PathVariable Long customerId,
+                        @PathVariable Long accountId,
+                        @AuthenticationPrincipal Jwt jwt) {
 
-        return customerService.addBankAccountToCustomer(
-                customerId,
-                accountId,
-                jwt);
-    }
+                return customerService.addBankAccountToCustomer(
+                                customerId,
+                                accountId,
+                                jwt);
+        }
 
-  
+        @GetMapping("/{customerId}/accounts")
+        public Set<BankAccountResponse> getBankAccountsByCustomerId(
+                        @PathVariable Long customerId,
+                        @AuthenticationPrincipal Jwt jwt) {
 
-    @GetMapping("/{customerId}/accounts")
-    public Set<BankAccountResponse> getBankAccountsByCustomerId(
-            @PathVariable Long customerId,
-            @AuthenticationPrincipal Jwt jwt) {
+                return customerService.getBankAccountsByCustomerId(
+                                customerId,
+                                jwt);
+        }
 
-        return customerService.getBankAccountsByCustomerId(
-                customerId,
-                jwt);
-    }
+        @PostMapping
+        @ResponseStatus(HttpStatus.CREATED)
+        public CustomerResponse createCustomer(
+                        @Valid @RequestBody CustomerRequest request) {
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CustomerResponse createCustomer(
-            @Valid @RequestBody CustomerRequest request) {
+                return customerService.createCustomer(request);
+        }
 
-        return customerService.createCustomer(request);
-    }
+        @GetMapping
+        public Page<CustomerResponse> getAllCustomers(
+                        @RequestParam(defaultValue = "0") int pageNo,
+                        @RequestParam(defaultValue = "5") int pageSize) {
 
-    @GetMapping
-    public List<CustomerResponse> getAllCustomers(
-            @RequestParam(required = false, defaultValue = "0") int pageNo,
-            @RequestParam(required = false, defaultValue = "5") int pageSize) {
+                return customerService.getAllCustomers(
+                                PageRequest.of(pageNo, pageSize));
+        }
 
-        return customerService.getAllCustomers(
-                PageRequest.of(pageNo, pageSize));
-    }
+        @GetMapping("/{id}")
+        public CustomerResponse getCustomerById(
+                        @PathVariable Long id,
+                        @AuthenticationPrincipal Jwt jwt) {
 
-    @GetMapping("/{id}")
-    public CustomerResponse getCustomerById(
-            @PathVariable Long id,
-            @AuthenticationPrincipal Jwt jwt) {
+                return customerService.getCustomerById(id, jwt);
+        }
 
-        return customerService.getCustomerById(id, jwt);
-    }
+        @PutMapping("/{id}")
+        public CustomerResponse updateCustomer(
+                        @PathVariable Long id,
+                        @Valid @RequestBody CustomerRequest request,
+                        @AuthenticationPrincipal Jwt jwt) {
 
-    @PutMapping("/{id}")
-    public CustomerResponse updateCustomer(
-            @PathVariable Long id,
-            @Valid @RequestBody CustomerRequest request,
-            @AuthenticationPrincipal Jwt jwt) {
+                return customerService.updateCustomer(
+                                id,
+                                request,
+                                jwt);
+        }
 
-        return customerService.updateCustomer(
-                id,
-                request,
-                jwt);
-    }
+        @DeleteMapping("/{id}")
+        @ResponseStatus(HttpStatus.NO_CONTENT)
+        public void deleteCustomer(
+                        @PathVariable Long id,
+                        @AuthenticationPrincipal Jwt jwt) {
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCustomer(
-            @PathVariable Long id,
-            @AuthenticationPrincipal Jwt jwt) {
+                customerService.deleteCustomer(id, jwt);
+        }
 
-        customerService.deleteCustomer(id, jwt);
-    }
+        @PutMapping("/{customerId}/keycloak-user")
+        public ResponseEntity<CustomerResponse> linkKeycloakUser(
+                        @PathVariable Long customerId,
+                        @Valid @RequestBody KeycloakUserLinkRequest request) {
 
-    @PutMapping("/{customerId}/keycloak-user")
-    public ResponseEntity<CustomerResponse> linkKeycloakUser(
-            @PathVariable Long customerId,
-            @Valid @RequestBody KeycloakUserLinkRequest request) {
+                return ResponseEntity.ok(
+                                customerService.linkKeycloakUser(
+                                                customerId,
+                                                request));
+        }
 
-        return ResponseEntity.ok(
-                customerService.linkKeycloakUser(
-                        customerId,
-                        request));
-    }
+        @GetMapping("/me")
+        public ResponseEntity<CustomerResponse> getMyCustomer(
+                        @AuthenticationPrincipal Jwt jwt) {
 
-    @GetMapping("/me")
-    public ResponseEntity<CustomerResponse> getMyCustomer(
-            @AuthenticationPrincipal Jwt jwt) {
+                return ResponseEntity.ok(
+                                customerService.getMyCustomer(jwt));
+        }
 
-        return ResponseEntity.ok(
-                customerService.getMyCustomer(jwt));
-    }
-    @DeleteMapping("/{customerId}/accounts/{accountId}")
-public BankAccountResponse removeBankAccountFromCustomer(
-        @PathVariable Long customerId,
-        @PathVariable Long accountId,
-        @AuthenticationPrincipal Jwt jwt) {
+        @DeleteMapping("/{customerId}/accounts/{accountId}")
+        public BankAccountResponse removeBankAccountFromCustomer(
+                        @PathVariable Long customerId,
+                        @PathVariable Long accountId,
+                        @AuthenticationPrincipal Jwt jwt) {
 
-    return customerService.removeBankAccountFromCustomer(
-            customerId,
-            accountId,
-            jwt);
-}   
+                return customerService.removeBankAccountFromCustomer(
+                                customerId,
+                                accountId,
+                                jwt);
+        }
 }
