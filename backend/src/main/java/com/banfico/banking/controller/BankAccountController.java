@@ -27,6 +27,9 @@ import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 
 import jakarta.validation.Valid;
 
@@ -54,14 +57,22 @@ public class BankAccountController {
     }
 
     @GetMapping
-public Page<BankAccountResponse> getAllBankAccounts(
-        @RequestParam(defaultValue = "0") int pageNo,
-        @RequestParam(defaultValue = "5") int pageSize) {
+    public Page<BankAccountResponse> getAllBankAccounts(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(defaultValue = "id,asc") String sort) {
 
-    return bankAccountService.getAllBankAccounts(
-            PageRequest.of(pageNo, pageSize)
-    );
-}
+        String[] sortParams = sort.split(",");
+
+        Sort.Direction direction = Sort.Direction.fromString(sortParams[1]);
+
+        Pageable pageable = PageRequest.of(
+                pageNo,
+                pageSize,
+                Sort.by(direction, sortParams[0]));
+
+        return bankAccountService.getAllBankAccounts(pageable);
+    }
 
     @PutMapping("/{id}")
     public BankAccountResponse updateBankAccount(
@@ -103,8 +114,7 @@ public Page<BankAccountResponse> getAllBankAccounts(
     public ResponseEntity<List<BankAccountResponse>> searchAccounts(
             @RequestParam String accountNumber) {
 
-        List<BankAccountResponse> accounts =
-                bankAccountService.searchAccount(accountNumber);
+        List<BankAccountResponse> accounts = bankAccountService.searchAccount(accountNumber);
 
         return ResponseEntity.ok(accounts);
     }
