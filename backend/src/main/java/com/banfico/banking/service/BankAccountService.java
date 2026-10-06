@@ -17,6 +17,8 @@ import com.banfico.banking.exception.DuplicateResourceException;
 import com.banfico.banking.spec.BankAccountSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class BankAccountService {
@@ -48,14 +50,10 @@ public class BankAccountService {
                 return toResponse(savedAccount);
         }
 
-        public List<BankAccountResponse> getAllBankAccounts() {
-
-                return bankAccountRepository.findAll()
-                                .stream()
-                                .map(this::toResponse)
-                                .toList();
-        }
-
+       public Page<BankAccountResponse> getAllBankAccounts(Pageable pageable) {
+    return bankAccountRepository.findAll(pageable)
+            .map(this::toResponse);
+}
         public BankAccountResponse getBankAccountById(Long id) {
                 BankAccount bankAccount = bankAccountRepository.findById(id)
                                 .orElseThrow(() -> new BankAccountNotFoundException(

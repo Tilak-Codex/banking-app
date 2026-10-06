@@ -179,8 +179,18 @@ public class CustomerService {
     return toResponse(customer);
 }
 
-   public Page<CustomerResponse> getAllCustomers(Pageable pageable) {
-    return customerRepository.findAll(pageable)
+   public Page<CustomerResponse> getAllCustomers(
+        Pageable pageable,
+        String name) {
+
+    if (name != null && !name.isBlank()) {
+        return customerRepository
+                .findByNameContainingIgnoreCase(name, pageable)
+                .map(this::toResponse);
+    }
+
+    return customerRepository
+            .findAll(pageable)
             .map(this::toResponse);
 }
 

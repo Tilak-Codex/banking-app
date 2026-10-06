@@ -22,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-
 import com.banfico.banking.dto.BankAccountResponse;
 import com.banfico.banking.dto.CustomerRequest;
 import com.banfico.banking.dto.CustomerResponse;
@@ -76,7 +75,8 @@ public class CustomerController {
         public Page<CustomerResponse> getAllCustomers(
                         @RequestParam(defaultValue = "0") int pageNo,
                         @RequestParam(defaultValue = "5") int pageSize,
-                        @RequestParam(defaultValue = "id,asc") String sort) {
+                        @RequestParam(defaultValue = "id,asc") String sort,
+                        @RequestParam(required = false) String name) {
 
                 String[] sortParams = sort.split(",");
 
@@ -87,7 +87,7 @@ public class CustomerController {
                                 pageSize,
                                 Sort.by(direction, sortParams[0]));
 
-                return customerService.getAllCustomers(pageable);
+                return customerService.getAllCustomers(pageable, name);
         }
 
         @GetMapping("/{id}")

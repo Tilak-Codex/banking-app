@@ -25,6 +25,8 @@ import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.dto.TransactionResponse;
 import com.banfico.banking.service.BankAccountService;
 import com.banfico.banking.service.TransactionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import jakarta.validation.Valid;
 
@@ -52,10 +54,14 @@ public class BankAccountController {
     }
 
     @GetMapping
-    public List<BankAccountResponse> getAllBankAccounts() {
+public Page<BankAccountResponse> getAllBankAccounts(
+        @RequestParam(defaultValue = "0") int pageNo,
+        @RequestParam(defaultValue = "5") int pageSize) {
 
-        return bankAccountService.getAllBankAccounts();
-    }
+    return bankAccountService.getAllBankAccounts(
+            PageRequest.of(pageNo, pageSize)
+    );
+}
 
     @PutMapping("/{id}")
     public BankAccountResponse updateBankAccount(
