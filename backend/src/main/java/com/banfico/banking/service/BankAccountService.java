@@ -50,8 +50,20 @@ public class BankAccountService {
                 return toResponse(savedAccount);
         }
 
-        public Page<BankAccountResponse> getAllBankAccounts(Pageable pageable) {
-                return bankAccountRepository.findAll(pageable)
+        public Page<BankAccountResponse> getAllBankAccounts(
+                        Pageable pageable,
+                        String accountNumber) {
+
+                if (accountNumber != null && !accountNumber.isBlank()) {
+                        return bankAccountRepository
+                                        .findByAccountNumberContainingIgnoreCase(
+                                                        accountNumber,
+                                                        pageable)
+                                        .map(this::toResponse);
+                }
+
+                return bankAccountRepository
+                                .findAll(pageable)
                                 .map(this::toResponse);
         }
 

@@ -30,7 +30,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -60,7 +59,8 @@ public class BankAccountController {
     public Page<BankAccountResponse> getAllBankAccounts(
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "5") int pageSize,
-            @RequestParam(defaultValue = "id,asc") String sort) {
+            @RequestParam(defaultValue = "id,asc") String sort,
+            @RequestParam(required = false) String accountNumber) {
 
         String[] sortParams = sort.split(",");
 
@@ -71,7 +71,9 @@ public class BankAccountController {
                 pageSize,
                 Sort.by(direction, sortParams[0]));
 
-        return bankAccountService.getAllBankAccounts(pageable);
+        return bankAccountService.getAllBankAccounts(
+                pageable,
+                accountNumber);
     }
 
     @PutMapping("/{id}")
