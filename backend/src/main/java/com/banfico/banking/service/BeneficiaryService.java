@@ -29,25 +29,25 @@ public class BeneficiaryService {
     }
 
     public BeneficiaryResponse createBeneficiary(
-            Long customerId,
-            BeneficiaryRequest request) {
+        Long customerId,
+        BeneficiaryRequest request) {
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
+    Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() ->
+                    new CustomerNotFoundException("Customer not found"));
 
-        Beneficiary beneficiary = new Beneficiary();
+    Beneficiary beneficiary = new Beneficiary();
 
-        beneficiary.setName(request.getName());
-        beneficiary.setAccountNumber(request.getAccountNumber());
-        beneficiary.setBankCode(request.getBankCode());
-        beneficiary.setCustomer(customer);
+    beneficiary.setName(request.getName());
+    beneficiary.setAccountNumber(request.getAccountNumber());
+    beneficiary.setBankCode(request.getBankCode());
+    beneficiary.setCustomer(customer);
 
-        Beneficiary savedBeneficiary =
-                beneficiaryRepository.save(beneficiary);
+    Beneficiary savedBeneficiary =
+            beneficiaryRepository.save(beneficiary);
 
-        return toResponse(savedBeneficiary);
-    }
+    return toResponse(savedBeneficiary);
+}
 
     public BeneficiaryResponse getBeneficiaryById(Long id) {
 

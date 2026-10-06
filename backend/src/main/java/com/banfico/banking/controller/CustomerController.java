@@ -113,11 +113,8 @@ public class CustomerController {
 
         @DeleteMapping("/{id}")
         @ResponseStatus(HttpStatus.NO_CONTENT)
-        public void deleteCustomer(
-                        @PathVariable Long id,
-                        @AuthenticationPrincipal Jwt jwt) {
-
-                customerService.deleteCustomer(id, jwt);
+        public void deleteCustomer(@PathVariable Long id) {
+                customerService.deleteCustomer(id);
         }
 
         @PutMapping("/{customerId}/keycloak-user")
@@ -140,14 +137,13 @@ public class CustomerController {
         }
 
         @DeleteMapping("/{customerId}/accounts/{accountId}")
-        public BankAccountResponse removeBankAccountFromCustomer(
-                        @PathVariable Long customerId,
-                        @PathVariable Long accountId,
-                        @AuthenticationPrincipal Jwt jwt) {
+public BankAccountResponse removeBankAccountFromCustomer(
+        @PathVariable Long customerId,
+        @PathVariable Long accountId) {
 
-                return customerService.removeBankAccountFromCustomer(
-                                customerId,
-                                accountId,
-                                jwt);
-        }
+    return customerService.removeBankAccountFromCustomer(
+            customerId,
+            accountId
+    );
+}       
 }

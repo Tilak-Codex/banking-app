@@ -33,13 +33,13 @@ public class BeneficiaryController {
     }
 
     @PostMapping("/customers/{customerId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public BeneficiaryResponse createBeneficiary(
-            @PathVariable Long customerId,
-            @Valid @RequestBody BeneficiaryRequest request) {
+@ResponseStatus(HttpStatus.CREATED)
+public BeneficiaryResponse createBeneficiary(
+        @PathVariable Long customerId,
+        @Valid @RequestBody BeneficiaryRequest request) {
 
-        return beneficiaryService.createBeneficiary(customerId, request);
-    }
+    return beneficiaryService.createBeneficiary(customerId, request);
+}
 
     @GetMapping("/{id}")
     public BeneficiaryResponse getBeneficiaryById(
@@ -75,12 +75,12 @@ public class BeneficiaryController {
 
         beneficiaryService.deleteBeneficiary(id);
     }
-    @GetMapping("/me")
-public ResponseEntity<List<BeneficiaryResponse>> getMyBeneficiaries(
-        @AuthenticationPrincipal Jwt jwt) {
 
-    return ResponseEntity.ok(
-            beneficiaryService.getMyBeneficiaries(jwt)
-    );
-}
+    @GetMapping("/me")
+    public ResponseEntity<List<BeneficiaryResponse>> getMyBeneficiaries(
+            @AuthenticationPrincipal Jwt jwt) {
+
+        return ResponseEntity.ok(
+                beneficiaryService.getMyBeneficiaries(jwt));
+    }
 }

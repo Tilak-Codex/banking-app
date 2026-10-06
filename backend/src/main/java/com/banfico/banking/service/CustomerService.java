@@ -91,32 +91,36 @@ public class CustomerService {
                 bankAccount.getAccountType());
     }
 
-    public BankAccountResponse removeBankAccountFromCustomer(
+    @Transactional
+public BankAccountResponse removeBankAccountFromCustomer(
         Long customerId,
-        Long accountId,
-        Jwt jwt) {
+        Long accountId) {
 
-        String keycloakUserId = jwt.getSubject();
+    Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() ->
+                    new CustomerNotFoundException("Customer not found"));
 
-        Customer customer = customerRepository
-                .findByIdAndKeycloakUserId(customerId, keycloakUserId)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
+    BankAccount bankAccount = bankAccountRepository.findById(accountId)
+            .orElseThrow(() ->
+                    new BankAccountNotFoundException("Bank account not found"));
 
-        BankAccount bankAccount = bankAccountRepository.findById(accountId)
-                .orElseThrow(() ->
-                        new BankAccountNotFoundException("Bank account not found"));
-
-        customer.getBankAccounts().remove(bankAccount);
-
-        customerRepository.save(customer);
-
-        return new BankAccountResponse(
-                bankAccount.getId(),
-                bankAccount.getAccountNumber(),
-                bankAccount.getBalance(),
-                bankAccount.getAccountType());
+    if (!customer.getBankAccounts().contains(bankAccount)) {
+        throw new BankAccountNotFoundException(
+                "Bank account is not linked to this customer"
+        );
     }
+
+    customer.getBankAccounts().remove(bankAccount);
+
+    customerRepository.save(customer);
+
+    return new BankAccountResponse(
+            bankAccount.getId(),
+            bankAccount.getAccountNumber(),
+            bankAccount.getBalance(),
+            bankAccount.getAccountType()
+    );
+}
 
     public Set<BankAccountResponse> getBankAccountsByCustomerId(
             Long customerId,
@@ -239,32 +243,32 @@ public class CustomerService {
     }
 
     @Transactional
-    public void deleteCustomer(Long id, Jwt jwt) {
+public void deleteCustomer(Long id) {
 
-        String keycloakUserId = jwt.getSubject();
+    Customer customer = customerRepository.findById(id)
+            .orElseThrow(() ->
+                    new CustomerNotFoundException("Customer not found"));
 
-        Customer customer = customerRepository
-                .findByIdAndKeycloakUserId(id, keycloakUserId)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
-
-        if (!customer.getBankAccounts().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Customer cannot be deleted because bank accounts are linked");
-        }
-
-        if (!customer.getBeneficiaries().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Customer cannot be deleted because beneficiaries exist");
-        }
-
-        if (!customer.getConsents().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Customer cannot be deleted because consents exist");
-        }
-
-        customerRepository.delete(customer);
+    if (!customer.getBankAccounts().isEmpty()) {
+        throw new IllegalArgumentException(
+                "Cannot delete customer with linked bank accounts"
+        );
     }
+
+    if (!customer.getBeneficiaries().isEmpty()) {
+        throw new IllegalArgumentException(
+                "Cannot delete customer with beneficiaries"
+        );
+    }
+
+    if (!customer.getConsents().isEmpty()) {
+        throw new IllegalArgumentException(
+                "Cannot delete customer with consents"
+        );
+    }
+
+    customerRepository.delete(customer);
+}
 
     public CustomerResponse linkKeycloakUser(
             Long customerId,
