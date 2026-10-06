@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 
 import com.banfico.banking.dto.BankAccountResponse;
 import com.banfico.banking.dto.CustomerRequest;
@@ -73,10 +75,19 @@ public class CustomerController {
         @GetMapping
         public Page<CustomerResponse> getAllCustomers(
                         @RequestParam(defaultValue = "0") int pageNo,
-                        @RequestParam(defaultValue = "5") int pageSize) {
+                        @RequestParam(defaultValue = "5") int pageSize,
+                        @RequestParam(defaultValue = "id,asc") String sort) {
 
-                return customerService.getAllCustomers(
-                                PageRequest.of(pageNo, pageSize));
+                String[] sortParams = sort.split(",");
+
+                Sort.Direction direction = Sort.Direction.fromString(sortParams[1]);
+
+                Pageable pageable = PageRequest.of(
+                                pageNo,
+                                pageSize,
+                                Sort.by(direction, sortParams[0]));
+
+                return customerService.getAllCustomers(pageable);
         }
 
         @GetMapping("/{id}")
