@@ -3,48 +3,91 @@ package com.banfico.banking.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(
-                        HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
-                http
-                                .csrf(csrf -> csrf.disable()) // application is using a REST API with JWT bearer
-                                                              // authentication rather
-                                                              // than traditional server-side session/form
-                                                              // authentication. For this API
-                                                              // architecture, we'll disable CSRF.
-                                .cors(Customizer.withDefaults())
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/actuator/**").permitAll()
-                                                .requestMatchers(HttpMethod.POST, "/api/accounts")
-                                                .hasRole("ADMIN")
-                                                .requestMatchers(HttpMethod.POST, "/api/transactions")
-                                                .hasAnyRole("MAKER", "CLIENT")
-                                                .requestMatchers(HttpMethod.POST, "/api/transactions")
-                                                .hasAnyRole("MAKER", "CLIENT")
-                                                .requestMatchers(HttpMethod.DELETE, "/api/beneficiaries/{id}")
-                                                .hasAnyRole("ADMIN", "CHECKER")
-                                                .requestMatchers(
-                                                                HttpMethod.PUT,
-                                                                "/api/customers/*/keycloak-user")
-                                                .hasRole("ADMIN")
-                                                .anyRequest().authenticated())
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
 
-                                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(
-                                                new KeycloakJwtAuthenticationConverter()))); // means now our spring
-                                                                                             // appn is a resource
+                .authorizeHttpRequests(auth -> auth
 
-                return http.build();
-        }
+                        // Actuator endpoints are publicly accessible
+                        .requestMatchers("/actuator/**")
+                        .permitAll()
+
+                        // Only ADMIN can create bank accounts
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/accounts"
+                        )
+                        .hasRole("ADMIN")
+
+                        // Only ADMIN can delete customers
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/customers/*"
+                        )
+                        .hasRole("ADMIN")
+
+                        // Only ADMIN can unlink a bank account
+                        // from a customer
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/customers/*/accounts/*"
+                        )
+                        .hasRole("ADMIN")
+
+                        // MAKER and CLIENT can create transactions
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/transactions"
+                        )
+                        .hasAnyRole("MAKER", "CLIENT")
+
+                        // MAKER and CLIENT can make transfers
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/transactions/transfer"
+                        )
+                        .hasAnyRole("MAKER", "CLIENT")
+
+                        // ADMIN and CHECKER can delete beneficiaries
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/beneficiaries/*"
+                        )
+                        .hasAnyRole("ADMIN", "CHECKER")
+
+                        // Only ADMIN can link a Keycloak user
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/customers/*/keycloak-user"
+                        )
+                        .hasRole("ADMIN")
+
+                        // Every other request requires authentication
+                        .anyRequest()
+                        .authenticated()
+                )
+
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwt ->
+                                jwt.jwtAuthenticationConverter(
+                                        new KeycloakJwtAuthenticationConverter()
+                                )
+                        )
+                );
+
+        return http.build();
+    }
 }
-
-// .anyRequest().authenticated() -> DisAllow every request (need aunthentication
-// required)

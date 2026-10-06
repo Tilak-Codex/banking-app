@@ -112,14 +112,6 @@ public class BankAccountController {
         return bankAccountService.getBankAccountById(id);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<BankAccountResponse>> searchAccounts(
-            @RequestParam String accountNumber) {
-
-        List<BankAccountResponse> accounts = bankAccountService.searchAccount(accountNumber);
-
-        return ResponseEntity.ok(accounts);
-    }
 
     @GetMapping("/me")
     public ResponseEntity<List<BankAccountResponse>> getMyAccounts(
