@@ -50,10 +50,11 @@ public class BankAccountService {
                 return toResponse(savedAccount);
         }
 
-       public Page<BankAccountResponse> getAllBankAccounts(Pageable pageable) {
-    return bankAccountRepository.findAll(pageable)
-            .map(this::toResponse);
-}
+        public Page<BankAccountResponse> getAllBankAccounts(Pageable pageable) {
+                return bankAccountRepository.findAll(pageable)
+                                .map(this::toResponse);
+        }
+
         public BankAccountResponse getBankAccountById(Long id) {
                 BankAccount bankAccount = bankAccountRepository.findById(id)
                                 .orElseThrow(() -> new BankAccountNotFoundException(
@@ -118,45 +119,41 @@ public class BankAccountService {
                                 bankAccount.getBalance(),
                                 bankAccount.getAccountType());
         }
-        public List<BankAccountResponse> searchAccount(String accountNumber) {
-    Specification<BankAccount> spec =
-            BankAccountSpecification.hasAccount(accountNumber);
 
-    return bankAccountRepository.findAll(spec)
-            .stream()
-            .map(this::toResponse)
-            .toList();
-}
-public List<BankAccountResponse> getMyAccounts(Jwt jwt) {
+        public Page<BankAccountResponse> searchAccount(
+                        String accountNumber,
+                        Pageable pageable) {
 
-    String keycloakUserId = jwt.getSubject();
+                return bankAccountRepository
+                                .findByAccountNumberContainingIgnoreCase(accountNumber, pageable)
+                                .map(this::toResponse);
+        }
 
-    List<BankAccount> accounts =
-            bankAccountRepository.findByCustomers_KeycloakUserId(
-                    keycloakUserId
-            );
+        public List<BankAccountResponse> getMyAccounts(Jwt jwt) {
 
-    return accounts.stream()
-            .map(this::toResponse)
-            .toList();
-}
-public BankAccountResponse getMyBankAccountById(
-        Long id,
-        Jwt jwt) {
+                String keycloakUserId = jwt.getSubject();
 
-    String keycloakUserId = jwt.getSubject();
-System.out.println("JWT subject: " + jwt.getSubject());
-    BankAccount bankAccount =
-            bankAccountRepository
-                    .findByIdAndCustomers_KeycloakUserId(
-                            id,
-                            keycloakUserId
-                    )
-                    .orElseThrow(() ->
-                            new BankAccountNotFoundException(
-                                    "Bank account not found"
-                            ));
+                List<BankAccount> accounts = bankAccountRepository.findByCustomers_KeycloakUserId(
+                                keycloakUserId);
 
-    return toResponse(bankAccount);
-}
+                return accounts.stream()
+                                .map(this::toResponse)
+                                .toList();
+        }
+
+        public BankAccountResponse getMyBankAccountById(
+                        Long id,
+                        Jwt jwt) {
+
+                String keycloakUserId = jwt.getSubject();
+                System.out.println("JWT subject: " + jwt.getSubject());
+                BankAccount bankAccount = bankAccountRepository
+                                .findByIdAndCustomers_KeycloakUserId(
+                                                id,
+                                                keycloakUserId)
+                                .orElseThrow(() -> new BankAccountNotFoundException(
+                                                "Bank account not found"));
+
+                return toResponse(bankAccount);
+        }
 }
