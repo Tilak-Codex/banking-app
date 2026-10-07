@@ -29,14 +29,13 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
     volumes:
       - ./keycloak/import:/opt/keycloak/data/import
-    ports:
-      - "8081:8080"
+   # ports:
+    #  - "8081:8080"
 
   backend:
     build:
       context: ./backend
     container_name: banking-backend
-
     environment:
       DB_NAME: ${DB_NAME}
       DB_USERNAME: ${DB_USERNAME}
@@ -48,10 +47,10 @@ services:
 
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${OAUTH2_ISSUER_URI}
 
-      KEYCLOAK_JWK_SET_URI: http://banking-keycloak:8080/realms/banking/protocol/openid-connect/certs
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/banking/protocol/openid-connect/certs
 
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
 
     depends_on:
       postgres:
@@ -68,11 +67,24 @@ services:
     command: sh -c "npm install && npm run dev -- --hostname 0.0.0.0 --port 3000"
     volumes:
       - ./frontend:/app
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     depends_on:
       - backend
       - keycloak
+
+  nginx:
+    image: nginx:alpine
+    container_name: banking-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+      - keycloak
+    restart: unless-stopped
 
 volumes:
   postgres_data:
