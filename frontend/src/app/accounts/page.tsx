@@ -15,24 +15,55 @@ export default function AccountsPage() {
   const [accounts, setAccounts] = useState<BankAccountResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
 
-  const isClient = keycloak.realmAccess?.roles.includes("CLIENT");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchAccountNumber, setSearchAccountNumber] = useState("");
+
+  const [pageNo, setPageNo] = useState(0);
+  const [pageSize] = useState(5);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [sort, setSort] = useState("id,asc");
+
+  const isClient =
+    keycloak.realmAccess?.roles.includes("CLIENT") ?? false;
 
   useEffect(() => {
     loadAccounts();
-  }, []);
+  }, [pageNo, searchAccountNumber, sort]);
 
   async function loadAccounts() {
     try {
       setLoading(true);
       setError("");
 
-      const data = isClient
-        ? await bankAccountApi.getMe()
-        : await bankAccountApi.getAll();
+      if (isClient) {
+        const data = await bankAccountApi.getMe();
 
-      setAccounts(data);
+        const filteredAccounts = searchAccountNumber
+          ? data.filter((account) =>
+              account.accountNumber
+                .toLowerCase()
+                .includes(searchAccountNumber.toLowerCase())
+            )
+          : data;
+
+        setAccounts(filteredAccounts);
+        setTotalElements(filteredAccounts.length);
+        setTotalPages(1);
+      } else {
+        const data = await bankAccountApi.getAll(
+          pageNo,
+          pageSize,
+          sort,
+          searchAccountNumber
+        );
+
+        setAccounts(data.content);
+        setTotalPages(data.totalPages);
+        setTotalElements(data.totalElements);
+      }
     } catch (error) {
       setError(
         error instanceof Error
@@ -44,45 +75,36 @@ export default function AccountsPage() {
     }
   }
 
-  async function searchAccounts() {
-    try {
-      setLoading(true);
-      setError("");
+  function handleSearch(event: React.FormEvent) {
+    event.preventDefault();
 
-      if (!searchTerm.trim()) {
-        await loadAccounts();
-        return;
-      }
+    setPageNo(0);
+    setSearchAccountNumber(searchTerm.trim());
+  }
 
-      if (isClient) {
-        const myAccounts = await bankAccountApi.getMe();
+  function handleClear() {
+    setSearchTerm("");
+    setSearchAccountNumber("");
+    setPageNo(0);
+  }
 
-        const filteredAccounts = myAccounts.filter(
-          (account) =>
-            account.accountNumber
-              .toLowerCase()
-              .includes(searchTerm.trim().toLowerCase())
-        );
+  function handleSortChange(
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) {
+    setSort(event.target.value);
+    setPageNo(0);
+  }
 
-        setAccounts(filteredAccounts);
-      } else {
-        const data = await bankAccountApi.search(searchTerm);
-
-        setAccounts(data);
-      }
-    } catch (error) {
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to search accounts"
-      );
-    } finally {
-      setLoading(false);
+  function handlePrevious() {
+    if (pageNo > 0) {
+      setPageNo((currentPage) => currentPage - 1);
     }
   }
 
-  if (loading) {
-    return <p>Loading accounts...</p>;
+  function handleNext() {
+    if (pageNo < totalPages - 1) {
+      setPageNo((currentPage) => currentPage + 1);
+    }
   }
 
   if (error) {
@@ -101,48 +123,119 @@ export default function AccountsPage() {
     <main>
       <h1>Bank Accounts</h1>
 
-      <div>
+      <form onSubmit={handleSearch}>
         <input
           type="text"
           placeholder="Enter account number"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(event) => setSearchTerm(event.target.value)}
         />
 
-        <button onClick={searchAccounts}>
+        <button type="submit">
           Search
         </button>
 
         <button
-          onClick={() => {
-            setSearchTerm("");
-            loadAccounts();
-          }}
+          type="button"
+          onClick={handleClear}
         >
           Clear
         </button>
-      </div>
+      </form>
 
-      {accounts.length === 0 ? (
+      <br />
+
+      {!isClient && (
+        <>
+          <label>
+            Sort by:{" "}
+            <select
+              value={sort}
+              onChange={handleSortChange}
+            >
+              <option value="id,asc">
+                ID - Ascending
+              </option>
+
+              <option value="id,desc">
+                ID - Descending
+              </option>
+
+              <option value="accountNumber,asc">
+                Account Number - A to Z
+              </option>
+
+              <option value="accountNumber,desc">
+                Account Number - Z to A
+              </option>
+
+              <option value="balance,asc">
+                Balance - Low to High
+              </option>
+
+              <option value="balance,desc">
+                Balance - High to Low
+              </option>
+            </select>
+          </label>
+
+          <br />
+          <br />
+        </>
+      )}
+
+      {loading ? (
+        <p>Loading accounts...</p>
+      ) : accounts.length === 0 ? (
         <p>No accounts found.</p>
       ) : (
-        <ul>
-          {accounts.map((account) => (
-            <li key={account.id}>
-              <Link href={`/accounts/${account.id}`}>
-                <strong>{account.accountNumber}</strong>
-              </Link>
+        <>
+          <p>
+            Showing {totalElements} account
+            {totalElements !== 1 ? "s" : ""}.
+          </p>
 
-              <br />
+          <ul>
+            {accounts.map((account) => (
+              <li key={account.id}>
+                <Link href={`/accounts/${account.id}`}>
+                  <strong>{account.accountNumber}</strong>
+                </Link>
 
-              Balance: {account.balance}
+                <br />
 
-              <br />
+                Balance: {account.balance}
 
-              Type: {account.accountType}
-            </li>
-          ))}
-        </ul>
+                <br />
+
+                Type: {account.accountType}
+              </li>
+            ))}
+          </ul>
+
+          {!isClient && totalPages > 0 && (
+            <div>
+              <button
+                onClick={handlePrevious}
+                disabled={pageNo === 0}
+              >
+                Previous
+              </button>
+
+              <span>
+                {" "}
+                Page {pageNo + 1} of {totalPages}{" "}
+              </span>
+
+              <button
+                onClick={handleNext}
+                disabled={pageNo >= totalPages - 1}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
     </main>
   );

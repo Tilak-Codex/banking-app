@@ -8,6 +8,7 @@ import {
   beneficiaryApi,
   BeneficiaryResponse,
 } from "@/api/beneficiaryApi";
+import keycloak from "@/auth/keycloak";
 
 export default function BeneficiariesPage() {
   const params = useParams();
@@ -19,6 +20,12 @@ export default function BeneficiariesPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const isAdmin =
+    keycloak.realmAccess?.roles.includes("ADMIN") ?? false;
+
+  const isChecker =
+    keycloak.realmAccess?.roles.includes("CHECKER") ?? false;
 
   useEffect(() => {
     loadBeneficiaries();
@@ -90,14 +97,19 @@ export default function BeneficiariesPage() {
       <br />
       <br />
 
-      <Link
-        href={`/customers/${customerId}/beneficiaries/create`}
-      >
-        Add Beneficiary
-      </Link>
+      {/* Only ADMIN can create beneficiaries */}
+      {isAdmin && (
+        <>
+          <Link
+            href={`/customers/${customerId}/beneficiaries/create`}
+          >
+            Add Beneficiary
+          </Link>
 
-      <br />
-      <br />
+          <br />
+          <br />
+        </>
+      )}
 
       {beneficiaries.length === 0 ? (
         <p>No beneficiaries found.</p>
@@ -114,14 +126,20 @@ export default function BeneficiariesPage() {
               Bank Code: {beneficiary.bankCode}
               <br />
 
-              <button
-                type="button"
-                onClick={() =>
-                  handleDelete(beneficiary.id)
-                }
-              >
-                Delete
-              </button>
+              {/* ADMIN and CHECKER can delete */}
+              {(isAdmin || isChecker) && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleDelete(beneficiary.id)
+                  }
+                >
+                  Delete
+                </button>
+              )}
+
+              <br />
+              <br />
             </li>
           ))}
         </ul>

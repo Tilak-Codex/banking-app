@@ -6,11 +6,14 @@ import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import { transactionApi } from "@/api/transactionApi";
+import { useNotification } from "@/components/NotificationProvider";
 
 export default function CreateTransactionPage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const { showSuccess, showError } = useNotification();
 
   const accountId = Number(params.id);
 
@@ -43,15 +46,25 @@ export default function CreateTransactionPage() {
         bankAccountId: accountId,
       });
 
-      router.push(`/accounts/${accountId}`);
+      showSuccess(
+        transactionType === "DEPOSIT"
+          ? "Deposit successful"
+          : "Withdrawal successful"
+      );
+
+      setTimeout(() => {
+        router.push(`/accounts/${accountId}`);
+      }, 1000);
     } catch (error) {
       const apiError = error as Error & {
         status?: number;
       };
 
-      setError(
-        apiError.message || "Failed to create transaction."
-      );
+      const message =
+        apiError.message || "Failed to create transaction.";
+
+      setError(message);
+      showError(message);
     } finally {
       setLoading(false);
     }
@@ -66,7 +79,7 @@ export default function CreateTransactionPage() {
     <main>
       <h1>{transactionTitle}</h1>
 
-      <p>Account ID: {accountId}</p>
+      {/* <p>Account ID: {accountId}</p> */}
 
       {error && <p>{error}</p>}
 

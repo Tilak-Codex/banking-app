@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 
 import Link from "next/link";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import {
   customerApi,
@@ -15,6 +16,7 @@ import keycloak from "@/auth/keycloak";
 
 export default function CustomerDetailsPage() {
   const params = useParams();
+  const router = useRouter();
 
   const id = Number(params.id);
 
@@ -25,8 +27,13 @@ export default function CustomerDetailsPage() {
 
   const [error, setError] = useState("");
 
+  const [deleting, setDeleting] = useState(false);
+
   const isClient =
     keycloak.realmAccess?.roles.includes("CLIENT") ?? false;
+
+  const isAdmin =
+    keycloak.realmAccess?.roles.includes("ADMIN") ?? false;
 
   useEffect(() => {
     loadCustomer();
@@ -50,6 +57,36 @@ export default function CustomerDetailsPage() {
       );
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!customer) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete customer "${customer.name}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeleting(true);
+      setError("");
+
+      await customerApi.delete(customer.id);
+
+      router.push("/customers");
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete customer"
+      );
+      setDeleting(false);
     }
   }
 
@@ -82,9 +119,7 @@ export default function CustomerDetailsPage() {
       </p>
 
       <p>
-        <Link href={`/customers/${customer.id}`}>
-          <strong>{customer.name}</strong>
-        </Link>
+        <strong>Name:</strong> {customer.name}
       </p>
 
       <p>
@@ -102,6 +137,20 @@ export default function CustomerDetailsPage() {
       >
         View Beneficiaries
       </Link>
+
+      {isAdmin && (
+        <>
+          <br />
+          <br />
+
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting..." : "Delete Customer"}
+          </button>
+        </>
+      )}
     </main>
   );
 }

@@ -1,15 +1,22 @@
 
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { transactionApi } from "@/api/transactionApi";
+import {
+  bankAccountApi,
+  BankAccountResponse,
+} from "@/api/bankAccountApi";
 
 export default function TransferPage() {
   const params = useParams();
   const router = useRouter();
 
   const accountId = Number(params.id);
+
+  const [account, setAccount] =
+    useState<BankAccountResponse | null>(null);
 
   const [destinationAccountNumber, setDestinationAccountNumber] =
     useState("");
@@ -19,6 +26,29 @@ export default function TransferPage() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [accountLoading, setAccountLoading] = useState(true);
+
+  useEffect(() => {
+    loadAccount();
+  }, [accountId]);
+
+  async function loadAccount() {
+    try {
+      setAccountLoading(true);
+      setError("");
+
+      const data = await bankAccountApi.getById(accountId);
+      setAccount(data);
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to load source account."
+      );
+    } finally {
+      setAccountLoading(false);
+    }
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -46,12 +76,33 @@ export default function TransferPage() {
     }
   }
 
+  if (accountLoading) {
+    return <p>Loading source account...</p>;
+  }
+
+  if (!account) {
+    return (
+      <main>
+        <h1>Transfer Money</h1>
+        <p>{error || "Source account not found."}</p>
+
+        <button
+          type="button"
+          onClick={() => router.push(`/accounts/${accountId}`)}
+        >
+          Back to Account
+        </button>
+      </main>
+    );
+  }
+
   return (
     <main>
       <h1>Transfer Money</h1>
 
       <p>
-        Source Account ID: <strong>{accountId}</strong>
+        <strong>Source Account Number:</strong>{" "}
+        {account.accountNumber}
       </p>
 
       <form onSubmit={handleSubmit}>
@@ -126,4 +177,3 @@ export default function TransferPage() {
     </main>
   );
 }
-

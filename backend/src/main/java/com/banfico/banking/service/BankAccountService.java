@@ -14,7 +14,7 @@ import com.banfico.banking.repository.BankAccountRepository;
 import com.banfico.banking.dto.CustomerResponse;
 import com.banfico.banking.dto.BankAccountUpdateRequest;
 import com.banfico.banking.exception.DuplicateResourceException;
-import com.banfico.banking.spec.BankAccountSpecification;
+
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.data.domain.Page;
